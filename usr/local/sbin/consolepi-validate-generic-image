@@ -142,6 +142,11 @@ check cmdline_bridge sh -c 'test -L /boot/cmdline.txt && test "$(readlink /boot/
 
 check generic_ssh_dropin test -f /etc/ssh/sshd_config.d/39-consolepi-generic-image.conf
 check generic_firstboot_enabled systemctl is-enabled --quiet consolepi-generic-image-firstboot.service
+check boot_network_enabled systemctl is-enabled --quiet consolepi-boot-network.service
+check boot_network_template cmp -s /usr/share/consolepi/consolepi-network.txt "$boot_mount/consolepi-network.txt"
+check boot_network_dependency grep -qx 'Requires=consolepi-boot-network.service' /etc/systemd/system/NetworkManager.service.d/consolepi-boot-network.conf
+check boot_network_order grep -qx 'After=consolepi-boot-network.service' /etc/systemd/system/NetworkManager.service.d/consolepi-boot-network.conf
+check boot_network_unit systemd-analyze verify /etc/systemd/system/consolepi-boot-network.service
 check generic_recovery_enabled systemctl is-enabled --quiet consolepi-generic-recovery.service
 for service in ssh nginx consolepi-web; do
     check "${service}_dependency" test -f "/etc/systemd/system/$service.service.d/consolepi-generic-image.conf"

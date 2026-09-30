@@ -75,7 +75,7 @@ if [ "$state" = claim_pending ]; then
     attempt=0
     while ! ip -o -4 address show dev eth0 scope global 2>/dev/null | grep -q ' inet '; do
         attempt=$((attempt + 1))
-        [ "$attempt" -lt 31 ] || fail 'ethernet DHCP adresa není dostupná pro dočasný firewall'
+        [ "$attempt" -lt 31 ] || fail 'ethernet IPv4 adresa není dostupná pro dočasný firewall'
         sleep 1
     done
     /usr/local/sbin/consolepi-control access generic-bootstrap >/dev/null ||
@@ -118,12 +118,12 @@ chmod 0640 /etc/consolepi/web.secret
 
 /usr/local/sbin/consolepi-control auth sync >/dev/null || fail 'nelze aktivovat klíčovou autentizaci konzolového účtu'
 
-# Rebuild the generic firewall from the Ethernet DHCP network instead of
+# Rebuild the generic firewall from the Ethernet IPv4 network instead of
 # carrying the master device's allow-list into a different deployment.
 attempt=0
 while ! ip -o -4 address show dev eth0 scope global 2>/dev/null | grep -q ' inet '; do
     attempt=$((attempt + 1))
-    [ "$attempt" -lt 31 ] || fail 'ethernet DHCP adresa není dostupná pro bezpečné nastavení firewallu'
+    [ "$attempt" -lt 31 ] || fail 'ethernet IPv4 adresa není dostupná pro bezpečné nastavení firewallu'
     sleep 1
 done
 /usr/local/sbin/consolepi-control access generic-bootstrap >/dev/null || fail 'nelze nastavit dočasný generic firewall'

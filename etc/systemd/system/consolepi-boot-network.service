@@ -1,0 +1,13 @@
+[Unit]
+Description=Import ConsolePi Ethernet configuration from boot partition
+After=local-fs.target
+Before=NetworkManager.service consolepi-generic-image-firstboot.service
+ConditionPathExists=/etc/consolepi/generic-image.json
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/lib/consolepi_boot_network.py
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

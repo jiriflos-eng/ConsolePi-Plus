@@ -161,3 +161,18 @@ public.
 Please do not publish security-sensitive issues, credentials, device
 configuration, serial transcripts or private keys. See
 [SECURITY.md](SECURITY.md).
+
+### Offline Ethernet configuration for generic images
+
+Newly built generic images include `consolepi-network.txt` on the FAT boot
+partition. After writing the card in Imager, edit it to set `MODE=static`,
+`ADDRESS=192.168.1.50/24`, `GATEWAY=192.168.1.1` and
+`DNS=192.168.1.1,1.1.1.1` (use your own network values). Gateway and DNS
+may be empty for an isolated LAN. The default is `MODE=dhcp`.
+
+Settings are imported before NetworkManager starts, then the file is renamed
+to `.applied` so later web changes persist. Invalid input blocks network startup
+and writes a `.error` file on the same partition. Fix the file offline and reboot.
+See the [image installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
+The published 1.9.0 generic-v16 image predates this feature and must be rebuilt;
+copying the configuration file alone into that image does not enable it.

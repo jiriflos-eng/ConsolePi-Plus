@@ -1,0 +1,13 @@
+# ConsolePi+ Ethernet IPv4 configuration (eth0).
+# Edit after writing the SD card, before booting the Raspberry Pi.
+# Use plain UTF-8 text. Lines starting with # are comments.
+# Set MODE=static and replace the example values below to avoid DHCP.
+# ADDRESS includes prefix length: /24 = 255.255.255.0.
+# GATEWAY and DNS may be empty for an isolated local network.
+# DNS accepts comma-separated IPv4 addresses.
+# MODE=dhcp ignores ADDRESS, GATEWAY and DNS.
+# Applied once, then renamed to consolepi-network.txt.applied.
+MODE=dhcp
+ADDRESS=192.168.1.50/24
+GATEWAY=192.168.1.1
+DNS=192.168.1.1,1.1.1.1

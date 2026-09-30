@@ -136,6 +136,7 @@ else
 fi
 
 python3 "$ROOT/tests/generic_behavior.py" || bad "generic image behavioral security tests"
+python3 "$ROOT/tests/boot_network_behavior.py" || bad "boot Ethernet configuration behavior"
 python3 "$ROOT/tests/network_apply_behavior.py" || bad "delayed network apply behavior"
 python3 "$ROOT/tests/apt_sources_behavior.py" || bad "APT repository source behavior"
 if [ "${CONSOLEPI_SKIP_ARCHIVE_TEST:-0}" != 1 ]; then

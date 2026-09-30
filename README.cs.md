@@ -183,3 +183,13 @@ na restart, ethernetový link, požadované služby ConsolePi+ a stavy čtyř
 sériových konzolí. Postup importu je v [návodu pro Zabbix](zabbix/README.md).
 Před aktivací SNMPv3 přidejte server nebo proxy Zabbixu do **Síť → Povolené
 zdroje přístupu**; UDP/161 není povolen mimo tento allowlist.
+
+### Statická adresa z boot oddílu generic image
+
+Nově sestavený generic image obsahuje na FAT boot oddílu soubor
+`consolepi-network.txt`. Po zápisu SD karty jej lze upravit na počítači
+a nastavit `MODE=static`, `ADDRESS=192.168.1.50/24`, `GATEWAY=192.168.1.1`
+a `DNS=192.168.1.1,1.1.1.1` podle vlastní sítě. DHCP pak pro první start
+není potřeba. Podrobný postup i řešení chyb jsou v
+[návodu pro image](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
+Vydaný image 1.9.0 generic-v16 tuto funkci ještě neobsahuje; je potřeba nový build.

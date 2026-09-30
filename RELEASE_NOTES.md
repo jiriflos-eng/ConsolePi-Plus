@@ -1,3 +1,12 @@
+## Unreleased — offline Ethernet IPv4 provisioning
+
+- Generic images include `consolepi-network.txt` on the visible boot partition.
+  Import static IPv4 or DHCP before NetworkManager starts; gateway/DNS are optional.
+- Consume the file once as `.applied`; report invalid input in `.error` and block
+  network startup until corrected. No changes to key-only Imager authentication.
+- Sanitize old boot network files and restore the default DHCP template when
+  preparing a master. Requires a rebuilt generic image; generic-v16 is unchanged.
+
 # ConsolePi+ 1.9.0 · Integrace a provoz
 
 - V **Síť → APT repozitáře** lze přepnout mezi oficiálními zdroji Debianu/Raspberry Pi a vlastním lokálním mirrorem. Každá změna se před uložením ověřuje odděleným během `apt-get update`, takže nefunkční mirror nenahradí funkční konfiguraci.

@@ -168,6 +168,9 @@ for target in \
     /usr/local/sbin/consolepi-prepare-generic-image \
     /usr/local/sbin/consolepi-validate-generic-image \
     /usr/local/lib/consolepi_firstboot_security.py \
+    /usr/local/lib/consolepi_boot_network.py \
+    /usr/share/consolepi/consolepi-network.txt \
+    /etc/systemd/system/consolepi-boot-network.service \
     /usr/local/lib/consolepi_imager_security.py \
     /usr/local/lib/consolepi_generic_recovery.py \
     /usr/local/libexec/consolepi-imager-guard \
@@ -278,6 +281,9 @@ install -m 0755 "$ROOT/usr/local/sbin/consolepi-generic-recovery" /usr/local/sbi
 install -m 0755 "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" /usr/local/sbin/consolepi-prepare-generic-image
 install -m 0755 "$ROOT/usr/local/sbin/consolepi-validate-generic-image" /usr/local/sbin/consolepi-validate-generic-image
 install -m 0644 "$ROOT/usr/local/lib/consolepi_firstboot_security.py" /usr/local/lib/consolepi_firstboot_security.py
+install -m 0644 "$ROOT/usr/local/lib/consolepi_boot_network.py" /usr/local/lib/consolepi_boot_network.py
+install -m 0644 "$ROOT/usr/share/consolepi/consolepi-network.txt" /usr/share/consolepi/consolepi-network.txt
+install -m 0644 "$ROOT/etc/systemd/system/consolepi-boot-network.service" /etc/systemd/system/consolepi-boot-network.service
 install -m 0644 "$ROOT/usr/local/lib/consolepi_imager_security.py" /usr/local/lib/consolepi_imager_security.py
 install -m 0644 "$ROOT/usr/local/lib/consolepi_generic_recovery.py" /usr/local/lib/consolepi_generic_recovery.py
 install -m 0755 "$ROOT/usr/local/libexec/consolepi-imager-guard" /usr/local/libexec/consolepi-imager-guard

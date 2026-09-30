@@ -70,6 +70,9 @@ fail()
 id console >/dev/null 2>&1 || fail 'chybí účet console'
 getent group consolepi-web >/dev/null 2>&1 || fail 'chybí skupina consolepi-web'
 [ -x /usr/local/sbin/consolepi-generic-image-firstboot ] || fail 'chybí first-boot program'
+for file in /usr/local/lib/consolepi_boot_network.py /usr/share/consolepi/consolepi-network.txt /etc/systemd/system/consolepi-boot-network.service; do
+    [ -f "$file" ] || fail "chybí boot network soubor $file"
+done
 [ -x /usr/local/sbin/consolepi-validate-generic-image ] || fail 'chybí post-sanitizační validátor'
 [ -f /etc/systemd/system/consolepi-generic-image-firstboot.service ] || fail 'chybí first-boot unit'
 [ -x /usr/local/sbin/consolepi-generic-recovery ] || fail 'chybí physical-console recovery program'
@@ -98,7 +101,7 @@ done
 [ -f /usr/local/lib/consolepi_imager_security.py ] || fail 'chybí Imager security modul'
 [ -w /etc ] && [ -w "$STATE_DIR" ] && [ -w /home/consolepi ] || fail 'potřebné filesystémy nejsou zapisovatelné'
 [ "$(df -Pk "$STATE_DIR" | awk 'NR==2 {print $4}')" -ge 10240 ] || fail 'je potřeba alespoň 10 MiB volného místa'
-for command in awk cat cp df find findmnt getent grep hostnamectl install journalctl ln mktemp mount mountpoint mv nft openssl passwd python3 readlink sshd ssh-keygen stat sync systemctl systemd-analyze systemd-run truncate tty; do
+for command in awk cat cmp cp df find findmnt getent grep hostnamectl install journalctl ln mktemp mount mountpoint mv nft openssl passwd python3 readlink sshd ssh-keygen stat sync systemctl systemd-analyze systemd-run truncate tty; do
     command -v "$command" >/dev/null 2>&1 || fail "chybí utilita $command"
 done
 
@@ -162,6 +165,11 @@ cat >"$prep_dir/dependency.conf" <<'EOF'
 [Unit]
 Requires=consolepi-generic-image-firstboot.service
 After=consolepi-generic-image-firstboot.service
+EOF
+cat >"$prep_dir/network-dependency.conf" <<'EOF'
+[Unit]
+Requires=consolepi-boot-network.service
+After=consolepi-boot-network.service
 EOF
 cat >"$prep_dir/radius.json" <<'EOF'
 {"primary_host":"","primary_port":1812,"primary_secret_set":false,"secondary_host":"","secondary_port":1812,"secondary_secret_set":false,"timeout":3,"retries":1,"accounting":false}
@@ -232,16 +240,21 @@ awk '$1 != "Include"' /etc/ssh/sshd_config >"$prep_dir/sshd_config"
 printf 'Include %s\n' "$prep_dir/generic-ssh.conf" >>"$prep_dir/sshd_config"
 printf '%s\n' 'Include /etc/ssh/sshd_config.d/*.conf' >>"$prep_dir/sshd_config"
 sshd -t -f "$prep_dir/sshd_config" || fail 'kandidátní generic SSH konfigurace není platná'
-for service in ssh nginx consolepi-web; do
+for service in ssh nginx consolepi-web NetworkManager; do
     source_unit=/etc/systemd/system/$service.service
     [ -f "$source_unit" ] || source_unit=/lib/systemd/system/$service.service
     [ -f "$source_unit" ] || source_unit=/usr/lib/systemd/system/$service.service
     [ -f "$source_unit" ] || fail "chybí systemd unit $service.service"
     cp "$source_unit" "$prep_dir/$service.service"
-    cat "$prep_dir/dependency.conf" >>"$prep_dir/$service.service"
+    if [ "$service" = NetworkManager ]; then
+        cat "$prep_dir/network-dependency.conf" >>"$prep_dir/$service.service"
+    else
+        cat "$prep_dir/dependency.conf" >>"$prep_dir/$service.service"
+    fi
 done
 systemd-analyze verify /etc/systemd/system/consolepi-generic-image-firstboot.service \
     /etc/systemd/system/consolepi-generic-recovery.service \
+    /etc/systemd/system/consolepi-boot-network.service "$prep_dir/NetworkManager.service" \
     "$prep_dir/ssh.service" "$prep_dir/nginx.service" "$prep_dir/consolepi-web.service" >/dev/null ||
     fail 'kandidátní generic systemd konfigurace není platná'
 
@@ -344,6 +357,8 @@ from consolepi_imager_security import clear_directory, sanitize_boot_partition
 clear_directory("/var/lib/cloud")
 sanitize_boot_partition(sys.argv[1])
 PY
+# Always publish the pristine DHCP template, never the master's old settings.
+install -m 0644 /usr/share/consolepi/consolepi-network.txt "$boot_mount/consolepi-network.txt"
 
 # Generic-only Raspberry Pi Imager 2.x compatibility. Imager owns and executes
 # the FAT firstrun payload. These guards constrain its two vendor entrypoints;
@@ -394,8 +409,12 @@ for service in ssh nginx consolepi-web; do
     install -m 0644 "$prep_dir/dependency.conf" "/etc/systemd/system/$service.service.d/consolepi-generic-image.conf"
 done
 
+# Reject invalid offline configuration before any DHCP profile can activate.
+install -d -m 0755 /etc/systemd/system/NetworkManager.service.d
+install -m 0644 "$prep_dir/network-dependency.conf" /etc/systemd/system/NetworkManager.service.d/consolepi-boot-network.conf
+
 systemctl daemon-reload
-systemctl enable consolepi-generic-image-firstboot.service consolepi-generic-recovery.service ssh nginx \
+systemctl enable consolepi-boot-network.service consolepi-generic-image-firstboot.service consolepi-generic-recovery.service ssh nginx \
     consolepi-web consolepi-port-monitor consolepi-update-check.timer >/dev/null
 
 /usr/local/sbin/consolepi-validate-generic-image || fail 'post-sanitizační validace selhala'
