@@ -302,6 +302,9 @@ rm -f "$STATE_DIR/generic-imager-customization-failed" "$STATE_DIR/generic-image
     "$STATE_DIR/.generic-imager-ssh-operation" "$STATE_DIR/.generic-imager-user-operation" \
     "$STATE_DIR/generic-imager-audit.jsonl" "$STATE_DIR/generic-recovery-active"
 
+# Remove obsolete claim material left by earlier provisioning versions.
+rm -f "$STATE_DIR/firstboot-claim.json" /home/consolepi/.consolepi-firstboot-token
+
 # No pre-existing login key may survive in a generic image.
 find /root /home -xdev -type f -path '*/.ssh/*' -delete 2>/dev/null || true
 find /root /home -xdev -type f \( -name '.bash_history' -o -name '.zsh_history' -o -name '.python_history' \) -delete 2>/dev/null || true

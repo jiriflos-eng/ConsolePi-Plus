@@ -113,6 +113,7 @@ check failure_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/gen
 check success_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/generic-imager-customization-imported"
 check audit_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/generic-imager-audit.jsonl"
 check recovery_active_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/generic-recovery-active"
+check legacy_claim_absent sh -c 'test ! -e /etc/consolepi/firstboot-claim.json && test ! -L /etc/consolepi/firstboot-claim.json && test ! -e /home/consolepi/.consolepi-firstboot-token && test ! -L /home/consolepi/.consolepi-firstboot-token'
 check consolepi_password_locked sh -c 'passwd -S consolepi | awk '\''$2 == "L" {ok=1} END {exit !ok}'\'''
 check console_password_locked sh -c 'passwd -S console | awk '\''$2 == "L" {ok=1} END {exit !ok}'\'''
 check authorized_keys_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh /home/consolepi/.ssh/authorized_keys
