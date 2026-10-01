@@ -3,6 +3,7 @@ import ipaddress
 import os
 from pathlib import Path
 import stat
+import subprocess
 import sys
 import tempfile
 
@@ -114,12 +115,34 @@ def apply(boot, profile=PROFILE):
         raise
 
 
+def import_after_imager_validation(boot, profile=PROFILE):
+    # A fresh image still has the pristine DHCP profile. Validate Imager's
+    # key-only transaction BEFORE replacing it with the explicit boot settings.
+    # This preserves the strict postvalidator rather than allowing arbitrary
+    # network customization through Imager. On a retry after success the marker
+    # permits replaying the import without revalidating the now-static profile.
+    from consolepi_firstboot_security import generic_state, validate_generic_image_report
+    from consolepi_imager_security import (
+        FAILURE_MARKER, SUCCESS_MARKER, validate_imager_markers,
+    )
+    state = generic_state("/etc/consolepi/firstboot.json", "/etc/consolepi/generic-image.json")
+    if state == "pending":
+        validate_generic_image_report("/etc/consolepi/generic-image-validation.json")
+        if not SUCCESS_MARKER.exists():
+            try:
+                subprocess.run(["/usr/local/libexec/consolepi-imager-postvalidate"], check=True)
+            except subprocess.CalledProcessError as exc:
+                raise ValueError("Imager validation failed; Ethernet settings were not imported") from exc
+        validate_imager_markers(FAILURE_MARKER, SUCCESS_MARKER)
+    return apply(boot, profile)
+
+
 def main():
     mount = Path("/etc/consolepi/imager-boot-mount").read_text().strip()
     boot = Path(mount)
     if not boot.is_absolute() or boot.parent != Path("/boot") or not boot.is_mount():
         raise ValueError("Invalid or unmounted ConsolePi firmware partition")
-    if apply(boot):
+    if import_after_imager_validation(boot):
         print("ConsolePi Ethernet configuration imported")
 
 

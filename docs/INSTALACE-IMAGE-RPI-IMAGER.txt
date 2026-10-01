@@ -71,7 +71,9 @@ Pouhé přidání textového souboru do tohoto staršího image nestačí.
    Počítač musí mít síťovou cestu k této adrese; při přímém kabelovém spojení
    nastavte i počítači jinou adresu ve stejné podsíti.
 
-Nastavení se načte před NetworkManagerem a uloží do ethernetového profilu.
+Na čerstvé kartě se nejprve ověří dokončená key-only customizace Imageru
+na původním DHCP profilu. Teprve potom se nastavení ze souboru uloží
+do ethernetového profilu, stále před spuštěním NetworkManageru.
 Platný soubor se přejmenuje na consolepi-network.txt.applied. Další starty
 proto nepřepisují nastavení změněné ve webu. Pro další offline změnu na
 vypnutém zařízení upravte soubor a přejmenujte jej zpět na

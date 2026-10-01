@@ -2,6 +2,8 @@
 
 - Generic images include `consolepi-network.txt` on the visible boot partition.
   Import static IPv4 or DHCP before NetworkManager starts; gateway/DNS are optional.
+- Validate the key-only Imager transaction before importing boot networking,
+  preserving the strict pristine-profile check on an unclaimed image.
 - Consume the file once as `.applied`; report invalid input in `.error` and block
   network startup until corrected. No changes to key-only Imager authentication.
 - Sanitize old boot network files and restore the default DHCP template when

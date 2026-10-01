@@ -2,6 +2,7 @@
 """Exercise boot imports without changing the host's network."""
 import configparser
 import os
+import subprocess
 from pathlib import Path
 import sys
 import tempfile
@@ -12,11 +13,69 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "usr/local/lib"))
 import consolepi_boot_network as network
 import consolepi_imager_security as imager
+import consolepi_firstboot_security as security
 
 STATIC = "MODE=static\nADDRESS=192.168.20.10/24\nGATEWAY=192.168.20.1\nDNS=192.168.20.1,1.1.1.1\n"
 
 
 class BootNetworkTests(unittest.TestCase):
+    def test_fresh_imager_validation_precedes_static_import(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(network.os, "sync", create=True):
+            boot = Path(directory)
+            profile = boot / "wired.nmconnection"
+            profile.write_text(network.profile_text("MODE=dhcp"))
+            (boot / network.NAME).write_text(STATIC)
+            marker = boot / "success"
+
+            def validate_imager(*args, **kwargs):
+                self.assertNotIn("method=manual", profile.read_text())
+                marker.write_bytes(imager.SUCCESS_CONTENT)
+
+            with patch.object(security, "generic_state", return_value="pending"), \
+                    patch.object(security, "validate_generic_image_report") as report, \
+                    patch.object(imager, "SUCCESS_MARKER", marker), \
+                    patch.object(imager, "validate_imager_markers") as markers, \
+                    patch.object(network.subprocess, "run", side_effect=validate_imager) as validator:
+                self.assertTrue(network.import_after_imager_validation(boot, profile))
+                report.assert_called_once()
+                markers.assert_called_once()
+                validator.assert_called_once()
+                self.assertIn("method=manual", profile.read_text())
+                # Retry after a power loss / interrupted provisioning transaction.
+                self.assertFalse(network.import_after_imager_validation(boot, profile))
+                validator.assert_called_once()
+
+    def test_failed_imager_validation_leaves_network_untouched(self):
+        with tempfile.TemporaryDirectory() as directory:
+            boot = Path(directory)
+            profile = boot / "wired.nmconnection"
+            profile.write_text("original DHCP profile")
+            (boot / network.NAME).write_text(STATIC)
+            with patch.object(security, "generic_state", return_value="pending"), \
+                    patch.object(security, "validate_generic_image_report"), \
+                    patch.object(imager, "SUCCESS_MARKER", boot / "missing"), \
+                    patch.object(network.subprocess, "run", side_effect=subprocess.CalledProcessError(1, "postvalidate")):
+                with self.assertRaises(ValueError):
+                    network.import_after_imager_validation(boot, profile)
+            self.assertEqual(profile.read_text(), "original DHCP profile")
+            self.assertTrue((boot / network.NAME).exists())
+
+    def test_invalid_validation_report_blocks_import(self):
+        with patch.object(security, "generic_state", return_value="pending"), \
+                patch.object(security, "validate_generic_image_report", side_effect=ValueError("invalid report")), \
+                patch.object(network, "apply") as apply:
+            with self.assertRaises(ValueError):
+                network.import_after_imager_validation(Path("/unused"))
+            apply.assert_not_called()
+
+    def test_completed_device_does_not_repeat_imager_validation(self):
+        with patch.object(security, "generic_state", return_value="complete"), \
+                patch.object(network.subprocess, "run") as validator, \
+                patch.object(network, "apply", return_value=False) as apply:
+            self.assertFalse(network.import_after_imager_validation(Path("/unused")))
+            validator.assert_not_called()
+            apply.assert_called_once()
+
     def test_static_windows_text(self):
         profile = configparser.ConfigParser()
         profile.read_string(network.profile_text("\ufeff# My settings\r\n" + STATIC.replace("\n", "\r\n")))
