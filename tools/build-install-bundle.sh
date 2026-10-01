@@ -33,6 +33,8 @@ tar --no-xattrs -C "$ROOT" \
     --exclude='./release-signing-private.pem.pub' \
     --exclude='./releases' \
     --exclude='./dist' \
+    --exclude='./dist-public' \
+    --exclude='./public-release' \
     --exclude='./__pycache__' \
     --exclude='./.DS_Store' \
     --exclude='*/.DS_Store' \

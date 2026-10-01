@@ -217,7 +217,14 @@ provozovaném ConsolePi+ jej nespouštějte.
    master už znovu nespouštějte před pořízením image vypnuté karty.
 4. Image před zveřejněním připojte jen pro čtení a ověřte, že neobsahuje
    žádný authorized_keys, ssh_host_* ani consolepi.key a že /etc/machine-id
-   má přesně first-boot hodnotu `uninitialized`.
+   má přesně first-boot hodnotu `uninitialized` a random-seed chybí i po vypnutí.
+   Zastavení systemd-random-seed před jeho odstraněním brání opětovnému uložení
+   při shutdownu. Samotné odstranění souborů nevymaže jejich obsah z volných
+   bloků ani starých transakcí journalu. Raw dump použité karty proto není
+   automaticky distribuovatelný: v oddělené pracovní kopii vyčistěte journal
+   a sestavte výsledný obraz pouze z přidělených bloků ext4 a clusterů FAT.
+   Původní dump zachovejte beze změn; výsledný image znovu ověřte jen pro čtení.
+   Komprese .xz obsah odstraněných souborů nesanitizuje.
 
 Při prvním startu nejprve doběhne customizace Raspberry Pi Imageru. Služba
 ConsolePi+ potom přijme právě jeden validní veřejný klíč ssh-ed25519 z účtu

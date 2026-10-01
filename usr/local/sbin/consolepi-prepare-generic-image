@@ -330,6 +330,9 @@ rm -f /etc/udev/rules.d/70-consolepi.rules
 find /var/log/consolepi /var/log/nginx -type f -delete 2>/dev/null || true
 journalctl --rotate >/dev/null 2>&1 || true
 journalctl --vacuum-time=1s >/dev/null 2>&1 || true
+# The active oneshot saves a new seed in ExecStop at shutdown. Stop it before
+# removing the seed so a successful poweroff cannot recreate shared entropy.
+systemctl stop systemd-random-seed.service || fail 'nelze zastavit ukládání random seed'
 rm -f /var/lib/systemd/random-seed /var/lib/dbus/machine-id
 install -o root -g root -m 0444 "$prep_dir/machine-id" /etc/.machine-id.consolepi-new
 mv -f /etc/.machine-id.consolepi-new /etc/machine-id

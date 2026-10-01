@@ -567,6 +567,7 @@ def test_machine_id_sanitization(root):
     assert "install -o root -g root -m 0444 \"$prep_dir/machine-id\" /etc/.machine-id.consolepi-new" in sanitizer
     assert "mv -f /etc/.machine-id.consolepi-new /etc/machine-id" in sanitizer
     assert "rm -f /var/lib/systemd/random-seed /var/lib/dbus/machine-id" in sanitizer
+    assert sanitizer.index("systemctl stop systemd-random-seed.service") < sanitizer.index("rm -f /var/lib/systemd/random-seed")
     assert "truncate -s 0 /etc/machine-id" not in sanitizer
     old_identity = b"0123456789abcdef0123456789abcdef\n"
     candidate = root / "machine-id"
