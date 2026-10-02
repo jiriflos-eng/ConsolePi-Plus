@@ -1,3 +1,17 @@
+# ConsolePi+ 1.9.1 · Offline Ethernet IPv4 provisioning
+
+- Generic images include `consolepi-network.txt` on the visible boot partition.
+  Import static IPv4 or DHCP before NetworkManager starts; gateway/DNS are optional.
+- Validate the key-only Imager transaction before importing boot networking,
+  preserving the strict pristine-profile check on an unclaimed image.
+- Consume the file once as `.applied`; report invalid input in `.error` and block
+  network startup until corrected. No changes to key-only Imager authentication.
+- Sanitize old boot network files and restore the default DHCP template when
+  preparing a master. The 1.9.1 generic image includes the feature; generic-v16 is unchanged.
+- Stop systemd-random-seed before sanitizing its seed and remove legacy claim tokens.
+- Include a Raspberry Pi Imager manifest with image sizes, SHA-256 hashes and SSH customization metadata.
+- Verified clean first boot and reboot on Raspberry Pi 3 with static IPv4, key-only SSH and HTTPS.
+
 # ConsolePi+ 1.9.0 · Integrace a provoz
 
 - V **Síť → APT repozitáře** lze přepnout mezi oficiálními zdroji Debianu/Raspberry Pi a vlastním lokálním mirrorem. Každá změna se před uložením ověřuje odděleným během `apt-get update`, takže nefunkční mirror nenahradí funkční konfiguraci.

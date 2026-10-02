@@ -1,6 +1,6 @@
-# ConsolePi+ 1.9.0 – instalace na nový Raspberry Pi 3
+# ConsolePi+ 1.9.1 – instalace na nový Raspberry Pi 3
 
-Tento postup používá hotový archiv `ConsolePi-Plus-1.9.0-install.tar.gz`. Nevyžaduje bitovou kopii SD karty a je určen pro čistý Raspberry Pi OS Lite s DHCP.
+Tento postup používá hotový archiv `ConsolePi-Plus-1.9.1-install.tar.gz`. Nevyžaduje bitovou kopii SD karty a je určen pro čistý Raspberry Pi OS Lite s DHCP.
 
 ## 1. Vytvoření SSH klíče
 
@@ -83,15 +83,15 @@ Po restartu se znovu přihlaste stejným příkazem.
 
 Z Macu odešlete hotový archiv přímo do domovského adresáře uživatele `consolepi`. Místo `IP_RPI` doplňte DHCP adresu zařízení:
 
-    scp -i "$HOME/.ssh/consolepi-admin" "ConsolePi-Plus-1.9.0-install.tar.gz" consolepi@IP_RPI:~/
+    scp -i "$HOME/.ssh/consolepi-admin" "ConsolePi-Plus-1.9.1-install.tar.gz" consolepi@IP_RPI:~/
 
 Pokud soubor nemáte v aktuálním adresáři, použijte jeho úplnou cestu, například:
 
-    scp -i "$HOME/.ssh/consolepi-admin" "$HOME/Downloads/ConsolePi-Plus-1.9.0-install.tar.gz" consolepi@IP_RPI:~/
+    scp -i "$HOME/.ssh/consolepi-admin" "$HOME/Downloads/ConsolePi-Plus-1.9.1-install.tar.gz" consolepi@IP_RPI:~/
 
 Ve Windows použijte v PowerShellu odpovídající cestu k soukromému klíči:
 
-    scp -i "$env:USERPROFILE\.ssh\consolepi-admin" "$HOME\Downloads\ConsolePi-Plus-1.9.0-install.tar.gz" consolepi@IP_RPI:~/
+    scp -i "$env:USERPROFILE\.ssh\consolepi-admin" "$HOME\Downloads\ConsolePi-Plus-1.9.1-install.tar.gz" consolepi@IP_RPI:~/
 
 ## 5. Instalace na Raspberry Pi
 
@@ -103,7 +103,7 @@ Na Raspberry Pi spusťte následující příkazy. Archiv se rozbalí do vašeho
 
     install_dir="$HOME/consolepi-install"
     mkdir -p "$install_dir"
-    tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.0-install.tar.gz" -C "$install_dir"
+    tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.1-install.tar.gz" -C "$install_dir"
     cd "$install_dir"
     ./bootstrap-install.sh
 
@@ -183,3 +183,13 @@ na restart, ethernetový link, požadované služby ConsolePi+ a stavy čtyř
 sériových konzolí. Postup importu je v [návodu pro Zabbix](zabbix/README.md).
 Před aktivací SNMPv3 přidejte server nebo proxy Zabbixu do **Síť → Povolené
 zdroje přístupu**; UDP/161 není povolen mimo tento allowlist.
+
+### Statická adresa z boot oddílu generic image
+
+Nově sestavený generic image obsahuje na FAT boot oddílu soubor
+`consolepi-network.txt`. Po zápisu SD karty jej lze upravit na počítači
+a nastavit `MODE=static`, `ADDRESS=192.168.1.50/24`, `GATEWAY=192.168.1.1`
+a `DNS=192.168.1.1,1.1.1.1` podle vlastní sítě. DHCP pak pro první start
+není potřeba. Podrobný postup i řešení chyb jsou v
+[návodu pro image](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
+Vydaný image 1.9.0 generic-v16 tuto funkci ještě neobsahuje; je potřeba nový build.

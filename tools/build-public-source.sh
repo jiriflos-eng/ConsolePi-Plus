@@ -26,6 +26,7 @@ tar -C "$ROOT" \
     --exclude='./authorized_keys' \
     --exclude='./release-signing-private.pem' \
     --exclude='./dist' \
+    --exclude='./downloads' \
     --exclude='./releases' \
     --exclude='./dist-public' \
     --exclude='./public-release' \

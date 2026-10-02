@@ -7,6 +7,7 @@ CONSOLEPI_SKIP_ARCHIVE_TEST=1 "$ROOT/tools/build-install-bundle.sh" "$OUTPUT" >/
 archive=$(find "$OUTPUT" -maxdepth 1 -type f -name '*.tar.gz' -print -quit)
 [ -n "$archive" ]
 tar -tzf "$archive" >"$OUTPUT/contents"
+! grep -Eq '^\./(dist-public|public-release|downloads)/' "$OUTPUT/contents"
 ! grep -Eq '(^|/)(authorized_keys|release-signing-private\.pem|release-signing-private\.pem\.pub)$' "$OUTPUT/contents"
 ! grep -Eq '^\./etc/systemd/system/(ssh|nginx|consolepi-web)\.service\.d/consolepi-generic-image\.conf$' "$OUTPUT/contents"
 mkdir "$OUTPUT/extracted"

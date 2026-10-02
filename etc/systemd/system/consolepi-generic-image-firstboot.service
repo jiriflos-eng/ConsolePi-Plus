@@ -1,6 +1,7 @@
 [Unit]
 Description=ConsolePi generic image first-boot provisioning
-After=local-fs.target
+Requires=consolepi-boot-network.service
+After=local-fs.target consolepi-boot-network.service
 Before=ssh.service nginx.service consolepi-web.service consolepi-port-monitor.service
 
 [Service]

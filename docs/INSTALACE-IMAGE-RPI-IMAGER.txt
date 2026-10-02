@@ -14,7 +14,7 @@ CO JE POTŘEBA
 - Raspberry Pi 3 Model B nebo B+
 - kvalitní microSD karta s kapacitou alespoň 8 GB
 - napájení Raspberry Pi
-- ethernetový kabel do sítě s DHCP (doporučeno pro první spuštění)
+- ethernetový kabel; DHCP server nebo známá volná statická IPv4 adresa
 - počítač s Raspberry Pi Imagerem a SSH klientem
 - soubor ConsolePi-...img.xz
 - vlastní Ed25519 veřejný SSH klíč správce (soubor s příponou .pub)
@@ -24,6 +24,10 @@ KROK 1 – ZÁPIS IMAGE
 1. Vložte SD kartu do počítače.
 2. Otevřete Raspberry Pi Imager.
 3. Klikněte na „Choose Device“ a vyberte Raspberry Pi 3.
+   Pro verzi 1.9.1 lze stáhnout a dvojklikem otevřít manifest:
+   https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest
+   Stejnou URL lze zadat v Nastavení → Content Repository → Edit
+   jako vlastní repozitář a potvrdit „Apply & Restart“.
 4. Klikněte na „Choose OS“ a vyberte **ConsolePi Plus Generic Image** z
    ConsolePi Plus custom repository. Přímé „Use custom“ v Imageru 2.0.x
    OS Customisation pro vlastní image nezpřístupní, proto není podporované.
@@ -36,20 +40,75 @@ KROK 1 – ZÁPIS IMAGE
      authentication only“ a vložte jeden vlastní veřejný klíč Ed25519,
    - nikdy nevkládejte soukromý klíč (soubor bez přípony .pub),
    - hostname, Wi-Fi a ostatní volby ponechte beze změny; první připojení
-     generic image je určené pro ethernet s DHCP.
+     generic image používá ethernet (DHCP nebo soubor popsaný níže).
    V celé OS Customisation nesmí být aktivní žádná jiná změna než SSH
    public-key authentication. I automaticky předvyplněné volby hostname,
    locale, timezone nebo Wi-Fi výslovně vypněte.
+   V průvodci Imageru 2.0.11.1 lze předvyplněné změny vymazat takto:
+   - zvolte „Přeskočit přizpůsobení“; tím se zruší všechny změny,
+   - na souhrnu zápisu klikněte na „Zpět“; otevře se krok SSH,
+   - povolte SSH a ověření veřejným klíčem, zkontrolujte vložený klíč
+     a klikněte na „Další“,
+   - souhrn musí obsahovat právě jednu změnu: „SSH povoleno“.
 8. Klikněte na „Write“ a potvrďte smazání SD karty.
 9. Vyčkejte na dokončení zápisu i ověření („Verification successful“).
-10. SD kartu bezpečně vysuňte.
+10. Pro statickou IPv4 pokračujte krokem 1A. Pro DHCP kartu bezpečně vysuňte.
+
+KROK 1A – STATICKÁ IPv4 BEZ DHCP
+---------------------------------
+Podpora vyžaduje nový image vytvořený ze zdrojů s consolepi-boot-network.
+Dříve vydaný ConsolePi-Plus-1.9.0-generic-v16.img.xz soubor ještě nenačítá.
+Pouhé přidání textového souboru do tohoto staršího image nestačí.
+
+1. Po zápisu a ověření v Imageru SD kartu znovu připojte k počítači.
+2. Otevřete viditelný FAT boot oddíl (obvykle bootfs). Je to oddíl obsahující
+   config.txt a cmdline.txt; linuxový oddíl není potřeba otevírat.
+3. Otevřete consolepi-network.txt v editoru prostého textu. Na macOS použijte
+   v TextEditu Formát > Převést na prostý text. Zachovejte přesný název souboru.
+4. Nastavte například (adresy nahraďte hodnotami pro svoji síť):
+
+   MODE=static
+   ADDRESS=192.168.1.50/24
+   GATEWAY=192.168.1.1
+   DNS=192.168.1.1,1.1.1.1
+
+   /24 odpovídá masce 255.255.255.0. Adresa musí být volná a brána musí být
+   ve stejné podsíti. GATEWAY= a DNS= lze ponechat prázdné pro izolovanou LAN.
+   Komentáře pište na samostatné řádky začínající #. Nepoužívejte uvozovky.
+   Soubor je UTF-8; podporované jsou konce řádků Windows i macOS/Linux.
+5. Uložte soubor, bezpečně vysuňte kartu a vložte ji do Raspberry Pi.
+6. Po startu otevřete https://192.168.1.50/ (nebo svou zvolenou adresu).
+   Počítač musí mít síťovou cestu k této adrese; při přímém kabelovém spojení
+   nastavte i počítači jinou adresu ve stejné podsíti.
+
+Na čerstvé kartě se nejprve ověří dokončená key-only customizace Imageru
+na původním DHCP profilu. Teprve potom se nastavení ze souboru uloží
+do ethernetového profilu, stále před spuštěním NetworkManageru.
+Platný soubor se přejmenuje na consolepi-network.txt.applied. Další starty
+proto nepřepisují nastavení změněné ve webu. Pro další offline změnu na
+vypnutém zařízení upravte soubor a přejmenujte jej zpět na
+consolepi-network.txt. MODE=dhcp obnoví DHCP; ostatní hodnoty se pak ignorují.
+Po dokončení webového průvodce zůstávají v platnosti management pravidla
+firewallu; při přesunu do jiné sítě je předem upravte ve webu.
+
+Při neplatném souboru se síť ani navazující první nastavení nespustí.
+Důvod je v consolepi-network.txt.error na boot oddílu a v lokálním journalu:
+  journalctl -u consolepi-boot-network.service
+Kartu po vypnutí vraťte do počítače, opravte soubor a spusťte zařízení znovu.
+Odstranění chybného souboru zachová dosavadní profil (u nového image DHCP).
+Soubor .error se odstraní po úspěšném importu. Platnost zápisu nezaručuje,
+že adresa není obsazená nebo že odpovídá připojené síti.
+
+Tento soubor řeší pouze Ethernet IPv4. SSH klíč stále nastavte v Imageru
+podle kroku 1; pravidla autentizace a webového dokončení se nemění.
 
 KROK 2 – PRVNÍ START
 --------------------
 1. Vložte SD kartu do Raspberry Pi.
 2. Připojte ethernet a napájení.
 3. Vyčkejte přibližně dvě až tři minuty na první start.
-4. Z DHCP serveru, routeru nebo síťového skeneru zjistěte IPv4 adresu RPi.
+4. Při DHCP zjistěte adresu z routeru nebo síťového skeneru. Při statickém
+   nastavení použijte adresu ze souboru consolepi-network.txt.
 
 KROK 3 – DOKONČENÍ VE WEBU
 
@@ -155,9 +214,11 @@ provozovaném ConsolePi+ jej nespouštějte.
    se resetují do neaktivního generického stavu s DHCP. Generic-only guardy
    chrání skutečné vendor entrypointy, které volá FAT payload Imageru. Povolí
    pouze `enable_ssh -k` s jediným Ed25519 veřejným klíčem a beze změny jej
-   uloží účtu `consolepi`; userconf přijme jen účet `consolepi` s prázdným
-   password argumentem. Imager nemusí při čistém key-only workflow userconf
-   volat. Ostatní operace vytvoří write-once persistentní failure marker;
+   uloží účtu `consolepi`. userconf přijme jen účet `consolepi`; dodaný
+   password argument ignoruje a systémové heslo ponechá uzamčené. Imager
+   může i při souhrnu „SSH povoleno“ přidat dříve uložené userconf, hostname,
+   keymap nebo timezone. Guard jejich validní volání zaznamená bez provedení
+   změny. Nepodporované nebo neplatné operace vytvoří write-once failure marker;
    první důvod se dalšími pokusy nepřepisuje. Metadata volání guardů se bez
    argumentů a tajemství ukládají do root-only `generic-imager-audit.jsonl`.
 3. Po sanitizaci proběhne nezávislá kontrola masteru. Výsledek se atomicky
@@ -168,18 +229,26 @@ provozovaném ConsolePi+ jej nespouštějte.
    master už znovu nespouštějte před pořízením image vypnuté karty.
 4. Image před zveřejněním připojte jen pro čtení a ověřte, že neobsahuje
    žádný authorized_keys, ssh_host_* ani consolepi.key a že /etc/machine-id
-   má přesně first-boot hodnotu `uninitialized`.
+   má přesně first-boot hodnotu `uninitialized` a random-seed chybí i po vypnutí.
+   Zastavení systemd-random-seed před jeho odstraněním brání opětovnému uložení
+   při shutdownu. Samotné odstranění souborů nevymaže jejich obsah z volných
+   bloků ani starých transakcí journalu. Raw dump použité karty proto není
+   automaticky distribuovatelný: v oddělené pracovní kopii vyčistěte journal
+   a sestavte výsledný obraz pouze z přidělených bloků ext4 a clusterů FAT.
+   Původní dump zachovejte beze změn; výsledný image znovu ověřte jen pro čtení.
+   Komprese .xz obsah odstraněných souborů nesanitizuje.
 
 Při prvním startu nejprve doběhne customizace Raspberry Pi Imageru. Služba
 ConsolePi+ potom přijme právě jeden validní veřejný klíč ssh-ed25519 z účtu
 consolepi, zkopíruje jej technickému účtu console a vytvoří nové hostitelské
 SSH klíče, TLS klíč a webové tajemství. Pokud klíč chybí, je neplatný nebo má
-nebezpečná oprávnění, SSH i web zůstanou zastavené. Po úspěchu vznikne
+nebezpečná oprávnění, SSH i web zůstanou zastavené.
 SSH veřejný klíč vložený Raspberry Pi Imagerem je použit jako počáteční administrativní přístup.
 V OS Customisation smí být zapnuto pouze SSH s public-key authentication a
 právě jedním Ed25519 klíčem. Username/password, hostname, Wi-Fi, locale,
 timezone, keyboard, Raspberry Pi Connect a všechny další volby jsou
-nepodporované. Po dokončení payloadu ConsolePi+ samostatně ověří účet, locked
+nepodporované. Automaticky přidaná validní volání userconf, hostname, keymap
+nebo timezone guard ignoruje; nejde o podporu těchto změn. Po dokončení payloadu ConsolePi+ samostatně ověří účet, locked
 password, klíč, login-capable účty, hostname, síťový profil, machine-id,
 odstranění FAT payloadu a `systemd.run`. Teprve potom atomicky vytvoří success
 marker; jakoukoli odchylku persistentně označí jako selhání a SSH ani web

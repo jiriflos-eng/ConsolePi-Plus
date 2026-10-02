@@ -28,11 +28,20 @@ available in English here and in Czech in [README.cs.md](README.cs.md).
 - signed application updates and a first-boot workflow suitable for cloned or
   custom SD-card images.
 
+## Ready-to-flash image with Raspberry Pi Imager
+
+[ConsolePi+ 1.9.1 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1)
+includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest).
+Open the downloaded manifest, or set its URL under Imager Settings → Content Repository → Edit.
+Select Raspberry Pi 3, ConsolePi+ 1.9.1 and the SD card, then enable key-only SSH with one Ed25519 public key.
+For static Ethernet IPv4, edit `consolepi-network.txt` on the boot partition after flashing and before the first boot.
+See [the installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt) for SSH-only customization and recovery.
+
 ## Quick installation on Raspberry Pi OS Lite
 
 Download the matching installer first from
-[downloads/ConsolePi-Plus-1.9.0-install.tar.gz](downloads/ConsolePi-Plus-1.9.0-install.tar.gz).
-Its [SHA-256 checksum](downloads/ConsolePi-Plus-1.9.0-install.tar.gz.sha256) is
+[ConsolePi-Plus-1.9.1-install.tar.gz](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz).
+Its [SHA-256 checksum](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz.sha256) is
 published alongside it.
 
 1. Use Raspberry Pi Imager to write **Raspberry Pi OS Lite (64-bit)** to the
@@ -54,13 +63,13 @@ published alongside it.
 
 4. Copy the release bundle to the `consolepi` home directory:
 
-       scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-1.9.0-install.tar.gz consolepi@PI_ADDRESS:~/
+       scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-1.9.1-install.tar.gz consolepi@PI_ADDRESS:~/
 
 5. Log in again and run the bootstrap installer:
 
        install_dir="$HOME/consolepi-install"
        mkdir -p "$install_dir"
-       tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.0-install.tar.gz" -C "$install_dir"
+       tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.1-install.tar.gz" -C "$install_dir"
        cd "$install_dir"
        ./bootstrap-install.sh
 
@@ -161,3 +170,18 @@ public.
 Please do not publish security-sensitive issues, credentials, device
 configuration, serial transcripts or private keys. See
 [SECURITY.md](SECURITY.md).
+
+### Offline Ethernet configuration for generic images
+
+Newly built generic images include `consolepi-network.txt` on the FAT boot
+partition. After writing the card in Imager, edit it to set `MODE=static`,
+`ADDRESS=192.168.1.50/24`, `GATEWAY=192.168.1.1` and
+`DNS=192.168.1.1,1.1.1.1` (use your own network values). Gateway and DNS
+may be empty for an isolated LAN. The default is `MODE=dhcp`.
+
+Settings are imported before NetworkManager starts, then the file is renamed
+to `.applied` so later web changes persist. Invalid input blocks network startup
+and writes a `.error` file on the same partition. Fix the file offline and reboot.
+See the [image installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
+The published 1.9.0 generic-v16 image predates this feature and must be rebuilt;
+copying the configuration file alone into that image does not enable it.
