@@ -40,6 +40,12 @@ KROK 1 – ZÁPIS IMAGE
    V celé OS Customisation nesmí být aktivní žádná jiná změna než SSH
    public-key authentication. I automaticky předvyplněné volby hostname,
    locale, timezone nebo Wi-Fi výslovně vypněte.
+   V průvodci Imageru 2.0.11.1 lze předvyplněné změny vymazat takto:
+   - zvolte „Přeskočit přizpůsobení“; tím se zruší všechny změny,
+   - na souhrnu zápisu klikněte na „Zpět“; otevře se krok SSH,
+   - povolte SSH a ověření veřejným klíčem, zkontrolujte vložený klíč
+     a klikněte na „Další“,
+   - souhrn musí obsahovat právě jednu změnu: „SSH povoleno“.
 8. Klikněte na „Write“ a potvrďte smazání SD karty.
 9. Vyčkejte na dokončení zápisu i ověření („Verification successful“).
 10. Pro statickou IPv4 pokračujte krokem 1A. Pro DHCP kartu bezpečně vysuňte.
