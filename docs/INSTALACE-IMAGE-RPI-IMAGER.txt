@@ -24,6 +24,10 @@ KROK 1 – ZÁPIS IMAGE
 1. Vložte SD kartu do počítače.
 2. Otevřete Raspberry Pi Imager.
 3. Klikněte na „Choose Device“ a vyberte Raspberry Pi 3.
+   Pro verzi 1.9.1 lze stáhnout a dvojklikem otevřít manifest:
+   https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest
+   Stejnou URL lze zadat v Nastavení → Content Repository → Edit
+   jako vlastní repozitář a potvrdit „Apply & Restart“.
 4. Klikněte na „Choose OS“ a vyberte **ConsolePi Plus Generic Image** z
    ConsolePi Plus custom repository. Přímé „Use custom“ v Imageru 2.0.x
    OS Customisation pro vlastní image nezpřístupní, proto není podporované.

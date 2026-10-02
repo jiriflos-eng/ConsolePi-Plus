@@ -28,11 +28,20 @@ available in English here and in Czech in [README.cs.md](README.cs.md).
 - signed application updates and a first-boot workflow suitable for cloned or
   custom SD-card images.
 
+## Ready-to-flash image with Raspberry Pi Imager
+
+[ConsolePi+ 1.9.1 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1)
+includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest).
+Open the downloaded manifest, or set its URL under Imager Settings → Content Repository → Edit.
+Select Raspberry Pi 3, ConsolePi+ 1.9.1 and the SD card, then enable key-only SSH with one Ed25519 public key.
+For static Ethernet IPv4, edit `consolepi-network.txt` on the boot partition after flashing and before the first boot.
+See [the installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt) for SSH-only customization and recovery.
+
 ## Quick installation on Raspberry Pi OS Lite
 
 Download the matching installer first from
-[downloads/ConsolePi-Plus-1.9.0-install.tar.gz](downloads/ConsolePi-Plus-1.9.0-install.tar.gz).
-Its [SHA-256 checksum](downloads/ConsolePi-Plus-1.9.0-install.tar.gz.sha256) is
+[ConsolePi-Plus-1.9.1-install.tar.gz](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz).
+Its [SHA-256 checksum](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz.sha256) is
 published alongside it.
 
 1. Use Raspberry Pi Imager to write **Raspberry Pi OS Lite (64-bit)** to the
@@ -54,13 +63,13 @@ published alongside it.
 
 4. Copy the release bundle to the `consolepi` home directory:
 
-       scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-1.9.0-install.tar.gz consolepi@PI_ADDRESS:~/
+       scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-1.9.1-install.tar.gz consolepi@PI_ADDRESS:~/
 
 5. Log in again and run the bootstrap installer:
 
        install_dir="$HOME/consolepi-install"
        mkdir -p "$install_dir"
-       tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.0-install.tar.gz" -C "$install_dir"
+       tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.1-install.tar.gz" -C "$install_dir"
        cd "$install_dir"
        ./bootstrap-install.sh
 
