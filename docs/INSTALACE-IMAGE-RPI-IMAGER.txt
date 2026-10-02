@@ -210,9 +210,11 @@ provozovaném ConsolePi+ jej nespouštějte.
    se resetují do neaktivního generického stavu s DHCP. Generic-only guardy
    chrání skutečné vendor entrypointy, které volá FAT payload Imageru. Povolí
    pouze `enable_ssh -k` s jediným Ed25519 veřejným klíčem a beze změny jej
-   uloží účtu `consolepi`; userconf přijme jen účet `consolepi` s prázdným
-   password argumentem. Imager nemusí při čistém key-only workflow userconf
-   volat. Ostatní operace vytvoří write-once persistentní failure marker;
+   uloží účtu `consolepi`. userconf přijme jen účet `consolepi`; dodaný
+   password argument ignoruje a systémové heslo ponechá uzamčené. Imager
+   může i při souhrnu „SSH povoleno“ přidat dříve uložené userconf, hostname,
+   keymap nebo timezone. Guard jejich validní volání zaznamená bez provedení
+   změny. Nepodporované nebo neplatné operace vytvoří write-once failure marker;
    první důvod se dalšími pokusy nepřepisuje. Metadata volání guardů se bez
    argumentů a tajemství ukládají do root-only `generic-imager-audit.jsonl`.
 3. Po sanitizaci proběhne nezávislá kontrola masteru. Výsledek se atomicky
@@ -236,12 +238,13 @@ Při prvním startu nejprve doběhne customizace Raspberry Pi Imageru. Služba
 ConsolePi+ potom přijme právě jeden validní veřejný klíč ssh-ed25519 z účtu
 consolepi, zkopíruje jej technickému účtu console a vytvoří nové hostitelské
 SSH klíče, TLS klíč a webové tajemství. Pokud klíč chybí, je neplatný nebo má
-nebezpečná oprávnění, SSH i web zůstanou zastavené. Po úspěchu vznikne
+nebezpečná oprávnění, SSH i web zůstanou zastavené.
 SSH veřejný klíč vložený Raspberry Pi Imagerem je použit jako počáteční administrativní přístup.
 V OS Customisation smí být zapnuto pouze SSH s public-key authentication a
 právě jedním Ed25519 klíčem. Username/password, hostname, Wi-Fi, locale,
 timezone, keyboard, Raspberry Pi Connect a všechny další volby jsou
-nepodporované. Po dokončení payloadu ConsolePi+ samostatně ověří účet, locked
+nepodporované. Automaticky přidaná validní volání userconf, hostname, keymap
+nebo timezone guard ignoruje; nejde o podporu těchto změn. Po dokončení payloadu ConsolePi+ samostatně ověří účet, locked
 password, klíč, login-capable účty, hostname, síťový profil, machine-id,
 odstranění FAT payloadu a `systemd.run`. Teprve potom atomicky vytvoří success
 marker; jakoukoli odchylku persistentně označí jako selhání a SSH ani web
