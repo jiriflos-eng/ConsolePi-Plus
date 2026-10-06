@@ -156,11 +156,11 @@
           <dt>Pouze události</dt>
           <dd>Ukládá jen připojení a odpojení USB kabelů. Nezaznamenává žádný obsah terminálu a představuje nejbezpečnější výchozí volbu.</dd>
           <dt>Pouze výstup zařízení</dt>
-          <dd>Neukládá samostatný vstup uživatele. Řádky obsahující výrazy jako <code>password</code>, <code>secret</code>, community string, token nebo privátní klíč nahrazuje značkou <code>[CITLIVY OBSAH ODSTRANEN]</code>.</dd>
+          <dd>V implementaci 1.9.1 se ukládá výstup zařízení přes nativní logování picocomu. Vstup uživatele se nezapisuje samostatně, zařízení jej však může vracet ve výstupu. Aktivní cesta relace neprovádí obsahovou redakci; nespoléhejte na popisek „aktivní redakce“.</dd>
           <dt>Úplný obousměrný přepis</dt>
-          <dd>Ukládá vstup i výstup bez obsahové redakce. Používejte pouze při vědomém řešení incidentu a log po skončení odstraňte.</dd>
+          <dd>Tento popisek neodpovídá implementaci 1.9.1: také režim full používá výstupní záznam picocomu, nikoli samostatný obousměrný recorder. Výstup může obsahovat citlivé údaje a není obsahově redigován. Používejte pouze po posouzení potřeby a ochrany záznamů.</dd>
         </dl>
-        <p class="security-note"><strong>Redakce není absolutní záruka.</strong> Síťové zařízení může heslo, klíč nebo konfiguraci vypsat v neočekávaném formátu. Pokud nesmí být zaznamenán žádný tajný údaj, použijte režim Pouze události.</p>
+        <p class="security-note"><strong>Výstupní záznam může obsahovat tajemství.</strong> Síťové zařízení může heslo, klíč nebo konfiguraci vypsat v neočekávaném formátu. Pokud nesmí být zaznamenán žádný tajný údaj, použijte režim Pouze události.</p>
         <p>Přepisy jsou rozdělené podle portů 2201–2204. Starší soubory se komprimují a limity celkové velikosti, jedné relace, doby uchování a volného místa chrání SD kartu před zaplněním. Tlačítko <strong>Prohlížet logy</strong> zpřístupní bezpečný náhled a <strong>Vymazat logy</strong> odstraní dokončené záznamy.</p>
       </div>
     </section>

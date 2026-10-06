@@ -12,6 +12,16 @@
 - Include a Raspberry Pi Imager manifest with image sizes, SHA-256 hashes and SSH customization metadata.
 - Verified clean first boot and reboot on Raspberry Pi 3 with static IPv4, key-only SSH and HTTPS.
 
+## Documentation refresh · 6 October 2026
+
+The main branch now includes dated 1.9.1 interface screenshots, auditor/technical
+DOCX documents and an acceptance workbook. Test results remain unassessed.
+Installation instructions distinguish the generic image/Imager manifest from
+bootstrap installation on clean Raspberry Pi OS Lite. Logging documentation
+and web help clarify that the 1.9.1 session path uses picocom output logging for
+both output/full and does not invoke the redaction writer. This documentation
+refresh does not replace the published 1.9.1 archives, image, manifest or tag.
+
 # ConsolePi+ 1.9.0 · Integrace a provoz
 
 - V **Síť → APT repozitáře** lze přepnout mezi oficiálními zdroji Debianu/Raspberry Pi a vlastním lokálním mirrorem. Každá změna se před uložením ověřuje odděleným během `apt-get update`, takže nefunkční mirror nenahradí funkční konfiguraci.

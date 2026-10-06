@@ -17,5 +17,18 @@ and publish the fix and advisory once users can update safely.
 
 ## Supported releases
 
-Only the latest released version should be treated as supported. Releases must
-be signed with the release administrator's offline/private signing key.
+The current supported release is **1.9.1**. Only the latest released version
+should be treated as supported. Application update packages must be signed
+with the release administrator's offline/private signing key. Published source,
+installer and image archives have SHA-256 checksums; checksums alone are not signatures.
+
+## Security assessment material for 1.9.1
+
+See [the security documentation](docs/security/README.md) for the auditor
+summary, technical document and acceptance workbook with dated UI screenshots.
+Screenshots illustrate controls; they do not establish that a test passed.
+The documents identify a mismatch between logging labels and the session
+implementation. Both `output` and `full` use `picocom` output logging; the
+active path does not apply the redaction writer. Device output may contain
+credentials, echoed input or configuration. Keep events-only logging when
+terminal content must not be retained.

@@ -1,10 +1,12 @@
 # ConsolePi+
 
-<sub>Light mode:</sub><br>
-<img width="359" height="276" alt="ConsolePi+ - dashboard" src="https://github.com/user-attachments/assets/911fd4b6-fda4-4be1-9d5f-32ab78845392" /><img width="359" height="276" alt="ConsolePi+ - health" src="https://github.com/user-attachments/assets/4408876b-0a74-4b4b-a5d3-8fa07a47aa8a" /><br>
-<sub>Dark mode:</sub><br>
-<img width="347" height="360" alt="Snímek obrazovky 2026-08-01 v 19 35 04" src="https://github.com/user-attachments/assets/0fe9cc1d-aa8b-46a6-94ae-c7070da7ab0f" /><img width="347" height="360" alt="Snímek obrazovky 2026-08-01 v 19 35 23" src="https://github.com/user-attachments/assets/edf5a3cd-bb01-410f-ba45-1c004b10984a" />
+Documentation for **ConsolePi+ 1.9.1** ([release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1)).
 
+![ConsolePi+ 1.9.1 administration overview](docs/screenshots/1.9.1/01-prehled.jpg)
+
+Screenshots were captured on a test Raspberry Pi on 6 October 2026. Addresses
+and settings shown are examples; the disconnected console has no USB adapter assigned.
+See the [interface gallery](docs/WEB-UI.md) and [security assessment documents](docs/security/README.md).
 
 ConsolePi+ turns a Raspberry Pi 3 into a secure, web-managed serial console
 server for network equipment. Each attached USB serial adapter is mapped to an
@@ -33,6 +35,11 @@ available in English here and in Czech in [README.cs.md](README.cs.md).
 [ConsolePi+ 1.9.1 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1)
 includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest).
 Open the downloaded manifest, or set its URL under Imager Settings → Content Repository → Edit.
+For a repository URL that follows the latest release, use:
+
+    https://github.com/jiriflos-eng/ConsolePi-Plus/releases/latest/download/ConsolePi-Plus.rpi-imager-manifest
+
+The version-specific manifest above stays pinned to 1.9.1.
 Select Raspberry Pi 3, ConsolePi+ 1.9.1 and the SD card, then enable key-only SSH with one Ed25519 public key.
 For static Ethernet IPv4, edit `consolepi-network.txt` on the boot partition after flashing and before the first boot.
 See [the installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt) for SSH-only customization and recovery.
@@ -101,8 +108,8 @@ Pi Imager or into the ConsolePi+ first-boot wizard. Windows PowerShell users
 should first run `New-Item -ItemType Directory -Force "$env:USERPROFILE\.ssh"`,
 then use the equivalent `ssh-keygen` command.
 
-When reusing an IP address after a first-boot reset, remove the old host key
-before reconnecting:
+After an intentional reinstall or identity regeneration, independently verify
+the new SSH host-key fingerprint. Only then remove the known old entry before reconnecting:
 
     ssh-keygen -R IP_RPI
 
@@ -113,7 +120,7 @@ The optional `consolepi-discover` client lists the IPv4 address, HTTPS URL and
 SSH command without scanning the subnet. It works on macOS, Windows and Linux
 from a single Go source tree in `tools/consolepi-discover`.
 
-Ready-to-run portable binaries are available in the
+The separately distributed Discovery client remains available in the
 [ConsolePi+ v1.9.0 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.0):
 macOS (Apple Silicon and Intel), Windows x64, and Linux (x64 and ARM64).
 The accompanying `consolepi-discover-v1.9.0.sha256` file verifies the downloads.
@@ -150,8 +157,8 @@ open outside this allowlist.
 
 ## Development and release safety
 
-This working tree can contain local build output and confidential material. Do
-not publish it directly. Before making a public GitHub repository, run:
+A development checkout can contain local build output and confidential material.
+Build release archives from a clean checkout and inspect them before publishing:
 
     ./tools/build-public-source.sh
 
@@ -161,9 +168,8 @@ archive before publishing. The public signing key
 `release-signing-private.pem.pub` may be published; the matching private key
 must never leave the release administrator's secure workstation.
 
-Read [PUBLIC_RELEASE.md](PUBLIC_RELEASE.md) before publishing. A project
-license must be chosen by the copyright holder before the repository is made
-public.
+Read [PUBLIC_RELEASE.md](PUBLIC_RELEASE.md) before publishing. The project is
+licensed under [MIT](LICENSE); retain upstream license notices.
 
 ## Security reporting
 
@@ -173,7 +179,7 @@ configuration, serial transcripts or private keys. See
 
 ### Offline Ethernet configuration for generic images
 
-Newly built generic images include `consolepi-network.txt` on the FAT boot
+The released 1.9.1 generic image includes `consolepi-network.txt` on the FAT boot
 partition. After writing the card in Imager, edit it to set `MODE=static`,
 `ADDRESS=192.168.1.50/24`, `GATEWAY=192.168.1.1` and
 `DNS=192.168.1.1,1.1.1.1` (use your own network values). Gateway and DNS
@@ -185,3 +191,14 @@ and writes a `.error` file on the same partition. Fix the file offline and reboo
 See the [image installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
 The published 1.9.0 generic-v16 image predates this feature and must be rebuilt;
 copying the configuration file alone into that image does not enable it.
+
+## Logging and security assessment
+
+The default **events** mode stores no terminal transcript. In the 1.9.1 source,
+`consolepi-session` uses the native `picocom --logfile` output recorder for both
+**output** and **full** modes. Operator input is not separately recorded, but a
+device can echo commands or return secrets in its output. The active session
+path does not invoke the redaction writer; do not rely on the web's “redaction”
+or “bidirectional” labels as guarantees. Use events mode when terminal contents
+must not be stored. See [the security assessment](docs/security/README.md) for
+source references, screenshot context and tests still requiring execution.

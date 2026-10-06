@@ -1,4 +1,4 @@
-ConsolePi+ – instalace vlastní SD image pomocí Raspberry Pi Imageru
+ConsolePi+ 1.9.1 – instalace generic SD image pomocí Raspberry Pi Imageru
 ===================================================================
 
 Tento postup je určen pro připravený soubor ConsolePi+ ve formátu .img.xz.
@@ -16,7 +16,7 @@ CO JE POTŘEBA
 - napájení Raspberry Pi
 - ethernetový kabel; DHCP server nebo známá volná statická IPv4 adresa
 - počítač s Raspberry Pi Imagerem a SSH klientem
-- soubor ConsolePi-...img.xz
+- soubor ConsolePi-Plus-1.9.1-generic.img.xz nebo manifest tohoto vydání
 - vlastní Ed25519 veřejný SSH klíč správce (soubor s příponou .pub)
 
 KROK 1 – ZÁPIS IMAGE
@@ -28,6 +28,9 @@ KROK 1 – ZÁPIS IMAGE
    https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest
    Stejnou URL lze zadat v Nastavení → Content Repository → Edit
    jako vlastní repozitář a potvrdit „Apply & Restart“.
+   URL sledující nejnovější vydání:
+   https://github.com/jiriflos-eng/ConsolePi-Plus/releases/latest/download/ConsolePi-Plus.rpi-imager-manifest
+   Pevná URL výše je vhodná pro opakovatelnou instalaci právě verze 1.9.1.
 4. Klikněte na „Choose OS“ a vyberte **ConsolePi Plus Generic Image** z
    ConsolePi Plus custom repository. Přímé „Use custom“ v Imageru 2.0.x
    OS Customisation pro vlastní image nezpřístupní, proto není podporované.
@@ -56,7 +59,7 @@ KROK 1 – ZÁPIS IMAGE
 
 KROK 1A – STATICKÁ IPv4 BEZ DHCP
 ---------------------------------
-Podpora vyžaduje nový image vytvořený ze zdrojů s consolepi-boot-network.
+Vydaný image ConsolePi-Plus-1.9.1-generic.img.xz tuto podporu obsahuje.
 Dříve vydaný ConsolePi-Plus-1.9.0-generic-v16.img.xz soubor ještě nenačítá.
 Pouhé přidání textového souboru do tohoto staršího image nestačí.
 

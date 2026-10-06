@@ -1,4 +1,4 @@
-# ConsolePi Plus template for Zabbix 7.4
+# ConsolePi+ 1.9.1 monitoring with Zabbix 7.4
 
 `template_consolepi_snmpv3_7.4.yaml` monitors a ConsolePi Plus system through its
 read-only SNMPv3 `authPriv` interface. It contains no user name or passphrases.
@@ -45,3 +45,10 @@ applies a `0.1` multiplier. Service state values are mapped as `1 = Active`
 and `2 = Inactive`. Serial-console states are `1 = Unassigned`, `2 =
 Disconnected`, and `3 = Connected`. The update count is read from ConsolePi Plus's
 local update-check cache; polling SNMP never starts APT or makes a network call.
+
+## ConsolePi+ 1.9.1 reference
+
+SNMPv3 is disabled until explicitly enabled. The [1.9.1 interface gallery](../docs/WEB-UI.md)
+shows its settings; the [acceptance workbook](../docs/security/03_Akceptacni_testy_se_screenshoty.xlsx)
+keeps monitoring checks unassessed until they are actually run. The operating
+system update count is independent of signed ConsolePi+ application packages.

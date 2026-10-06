@@ -1,5 +1,27 @@
 # ConsolePi+ 1.9.1 – instalace na nový Raspberry Pi 3
 
+![ConsolePi+ 1.9.1 – administrační přehled](docs/screenshots/1.9.1/01-prehled.jpg)
+
+Aktuální [obrazový přehled rozhraní](docs/WEB-UI.md) a
+[bezpečnostní podklady pro audit](docs/security/README.md) obsahují snímky
+z testovacího RPi z 6. 10. 2026. Zobrazené adresy jsou příklady.
+
+## Hotový image 1.9.1 v Raspberry Pi Imageru
+
+Stáhněte a otevřete [manifest verze 1.9.1](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest),
+nebo jeho URL vložte do **Nastavení → Content Repository → Edit** a potvrďte
+**Apply & Restart**. URL sledující nejnovější vydání:
+
+    https://github.com/jiriflos-eng/ConsolePi-Plus/releases/latest/download/ConsolePi-Plus.rpi-imager-manifest
+
+Vyberte Raspberry Pi 3 a ConsolePi+ 1.9.1. Nastavte pouze SSH s jedním veřejným
+klíčem Ed25519; ostatní přizpůsobení vypněte. Přímé „Use custom“ pro generic
+image nezpřístupňuje požadovanou OS customizaci. Pro statickou IPv4 po ověření
+zápisu upravte `consolepi-network.txt` na boot oddílu před prvním startem.
+Úplný postup: [instalace image](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
+
+## Ruční instalace na čistý Raspberry Pi OS Lite
+
 Tento postup používá hotový archiv `ConsolePi-Plus-1.9.1-install.tar.gz`. Nevyžaduje bitovou kopii SD karty a je určen pro čistý Raspberry Pi OS Lite s DHCP.
 
 ## 1. Vytvoření SSH klíče
@@ -127,7 +149,7 @@ Po dokončení otevřete v prohlížeči:
 
 U nového zařízení je normální varování prohlížeče o vlastním HTTPS certifikátu. Dokončete průvodce: nastavte heslo webové administrace, název zařízení, hostname a případně rozšíření oddílu SD karty. V kroku **Administrativní SSH přístup** buď vložte existující veřejný klíč `.pub`, nebo nechte vytvořit nový osobní klíč. V druhém případě se privátní soubor stáhne jen jednou; bezpečně jej uložte a použijte v SecureCRT jako Identity File.
 
-Dokončení průvodce vytvoří nové SSH hostitelské klíče. Pokud se na stejné IP adrese dříve nacházelo jiné ConsolePi+, odstraňte před dalším SSH starý fingerprint:
+Dokončení průvodce vytvoří nové SSH hostitelské klíče. Nezávisle ověřte nový fingerprint. Pokud se na stejné IP adrese dříve nacházelo jiné ConsolePi+, teprve potom odstraňte starý záznam:
 
     ssh-keygen -R IP_RPI
 
@@ -155,7 +177,7 @@ ve vzdálené síti proto použijte známou IP adresu nebo síťový mDNS reflec
 Nalezení přes mDNS není ověření identity: před zadáním přihlašovacích údajů
 vždy ověřte HTTPS certifikát nebo SSH host-key fingerprint.
 
-Hotové přenosné binárky jsou ke stažení v
+Samostatně vydaný Discovery klient je ke stažení v
 [releasu ConsolePi+ v1.9.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.0):
 pro macOS (Apple Silicon i Intel), Windows x64 a Linux (x64 i ARM64).
 Soubor `consolepi-discover-v1.9.0.sha256` slouží k ověření stažených binárek.
@@ -186,10 +208,20 @@ zdroje přístupu**; UDP/161 není povolen mimo tento allowlist.
 
 ### Statická adresa z boot oddílu generic image
 
-Nově sestavený generic image obsahuje na FAT boot oddílu soubor
+Vydaný generic image 1.9.1 obsahuje na FAT boot oddílu soubor
 `consolepi-network.txt`. Po zápisu SD karty jej lze upravit na počítači
 a nastavit `MODE=static`, `ADDRESS=192.168.1.50/24`, `GATEWAY=192.168.1.1`
 a `DNS=192.168.1.1,1.1.1.1` podle vlastní sítě. DHCP pak pro první start
 není potřeba. Podrobný postup i řešení chyb jsou v
 [návodu pro image](docs/INSTALACE-IMAGE-RPI-IMAGER.txt).
-Vydaný image 1.9.0 generic-v16 tuto funkci ještě neobsahuje; je potřeba nový build.
+Starší image 1.9.0 generic-v16 tuto funkci neobsahuje; použijte image 1.9.1.
+
+## Logování a bezpečnostní posouzení
+
+Výchozí režim **Pouze události** neukládá obsah terminálu. Zdrojový kód 1.9.1
+zaznamenává v režimech **output** i **full** výstup přes `picocom --logfile`.
+Vstup operátora nezapisuje samostatně, zařízení jej ale může vracet ve výstupu.
+Aktivní cesta relace nevolá redakční writer; na popisky „aktivní redakce“ nebo
+„obousměrný přepis“ proto nespoléhejte jako na záruku. Pokud se nesmí ukládat
+obsah terminálu, ponechte Pouze události. Podrobnosti a dosud nevyhodnocené
+testy jsou v [bezpečnostních podkladech](docs/security/README.md).

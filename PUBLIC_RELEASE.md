@@ -1,59 +1,54 @@
-# Public release checklist
+# ConsolePi+ public release checklist
 
-This repository is intended to become an open source ConsolePi Plus distribution.
-Complete every item below before making a GitHub repository public.
+The public repository is [jiriflos-eng/ConsolePi-Plus](https://github.com/jiriflos-eng/ConsolePi-Plus),
+licensed under [MIT](LICENSE). The current release is **1.9.1**. Use this
+checklist for subsequent publication; repository creation and license selection
+have already been completed.
 
-## 1. Select a license
+## Source and confidential material
 
-The copyright holder must select a license. For a permissive community project,
-MIT is a simple choice. GPL-3.0-or-later is more appropriate if every modified
-redistribution must remain open source. Do not publish until a final `LICENSE`
-file has been added.
+Create a clean source archive with `./tools/build-public-source.sh` and inspect
+its contents before publishing. Never commit private signing/SSH keys, device
+configuration, customer information, logs, transcripts or configured disk images.
+The public signing key can be distributed; its private counterpart stays on the
+release administrator's workstation. Build from a clean, reviewed checkout;
+local untracked output must not enter a release archive.
 
-## 2. Create a clean public source archive
+## Release artifacts
 
-Run from the project root:
+Use title **ConsolePi+ vX.Y.Z** and prefix `ConsolePi-Plus-X.Y.Z-*`.
+For 1.9.1 the release contains:
 
-    ./tools/build-public-source.sh
+- `ConsolePi-Plus-1.9.1-generic.img.xz`;
+- `ConsolePi-Plus-1.9.1-install.tar.gz` and `ConsolePi-Plus-1.9.1-source.tar.gz`;
+- per-archive SHA-256 files and `SHA256SUMS`;
+- `ConsolePi-Plus-1.9.1.rpi-imager-manifest` and the stable-name alias
+  `ConsolePi-Plus.rpi-imager-manifest`;
+- Imager icons and the image installation guide.
 
-The generated archive intentionally excludes:
+The manifest must reference the matching image URL, compressed/extracted sizes,
+SHA-256 values and supported SSH customization. Check both the pinned URL and
+`releases/latest/download/ConsolePi-Plus.rpi-imager-manifest` in Imager before
+publication. A URL following latest can change version; use the pinned manifest
+for reproducible deployment.
 
-- `release-signing-private.pem`;
-- local `authorized_keys`;
-- previously built update packages, installer archives and disk images;
-- macOS metadata and release-map files.
+Generic images must be sanitized and validated before publication. Remove
+administrator keys, device identity, web password, TLS private key, configured
+networks, proxy/mirror settings, secrets and logs. Verify fresh first boot and
+reboot with key-only SSH, the web wizard, and DHCP/static boot provisioning.
+Publish only the sanitized image and its checksums.
 
-Inspect the archive before uploading:
+Signed `.cpiupdate` application packages are a separate distribution mechanism.
+Do not imply that such a package exists for a release without publishing it;
+1.9.1 assets currently include the image, source and installer listed above.
+Keep previously published release assets and tags immutable when only updating
+repository documentation.
 
-    tar -tzf dist-public/ConsolePi-Plus-*-source.tar.gz
+## Documentation and third-party notices
 
-Never commit private keys, device images made from a configured appliance,
-RADIUS/SNMP passwords, access logs or serial transcripts.
-
-## 3. Create the GitHub repository
-
-Create an empty repository under the GitHub account **jiriflos-eng**:
-
-- name: `consolepi`;
-- visibility: **Private** during first review;
-- do not initialize it with a README, `.gitignore` or license.
-
-Once the repository name exists, ConsolePi Plus can be uploaded through the connected
-GitHub integration. Make it public only after this checklist, including the
-license, is complete.
-
-## 4. Release artifacts
-
-Publish source and installer archives as GitHub Release assets. Use the public
-release title **ConsolePi+ vX.Y.Z** and the `ConsolePi-Plus-X.Y.Z-*` asset-name
-prefix. A compressed `.img.xz` is optional and should be built from a
-factory-reset image. Publish its SHA-256 file alongside it. Do not publish an
-image that contains a known host key, web password, device identity or
-administrator public key.
-
-## 5. Third-party notices
-
-ConsolePi Plus installs and configures software from Raspberry Pi OS/Debian and
-other upstream projects. Keep their license notices and package licensing
-available. Do not imply endorsement by Raspberry Pi, Debian, Cisco or other
-vendors.
+Update both READMEs, installation guides, security policy and release notes for
+the new version. Keep historical release notes and separately versioned Discovery
+client links accurate. Use repository-local, dated screenshots with explanatory
+captions. Audit material must distinguish illustration from executed test evidence.
+Retain upstream licenses and notices for Raspberry Pi OS/Debian and other
+components; do not imply vendor endorsement.
