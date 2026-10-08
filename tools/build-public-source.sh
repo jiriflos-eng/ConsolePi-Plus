@@ -27,6 +27,7 @@ tar -C "$ROOT" \
     --exclude='./release-signing-private.pem' \
     --exclude='./dist' \
     --exclude='./downloads' \
+    --exclude='./outputs' \
     --exclude='./releases' \
     --exclude='./dist-public' \
     --exclude='./public-release' \

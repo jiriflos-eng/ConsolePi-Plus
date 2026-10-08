@@ -12,6 +12,17 @@
 - Include a Raspberry Pi Imager manifest with image sizes, SHA-256 hashes and SSH customization metadata.
 - Verified clean first boot and reboot on Raspberry Pi 3 with static IPv4, key-only SSH and HTTPS.
 
+## Syslog extension · 8 October 2026 (source revision)
+
+- Optional remote syslog with severity 0–7 and inclusive filtering (for example,
+  warning includes levels 0–4), TCP/TLS certificate verification and test messages.
+- Selected journal events only; serial transcripts are never read or forwarded.
+- Persistent bounded queue, retry state and queue-pressure/drop counters.
+- Fixed-field web login audit events and warning severity for denied sessions.
+- Backup configuration integration and sanitization/reset of destination, CA and queue.
+- The original 2 October image/archives do not contain this extension. Updated
+  distribution requires target-device validation; see [syslog distribution status](docs/SYSLOG.md#distribuce).
+
 ## Documentation refresh · 6 October 2026
 
 The main branch now includes dated 1.9.1 interface screenshots, auditor/technical

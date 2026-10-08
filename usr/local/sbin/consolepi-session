@@ -19,7 +19,7 @@ log()
 deny()
 {
     printf '%s\n' "$1" >&2
-    log "DENY user=${USER:-unknown} client=${SSH_CONNECTION:-unknown} reason=$1"
+    logger -p authpriv.warning -t consolepi -- "DENY user=${USER:-unknown} client=${SSH_CONNECTION:-unknown} reason=$1"
     exit 1
 }
 

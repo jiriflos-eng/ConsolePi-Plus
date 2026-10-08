@@ -202,3 +202,10 @@ path does not invoke the redaction writer; do not rely on the web's “redaction
 or “bidirectional” labels as guarantees. Use events mode when terminal contents
 must not be stored. See [the security assessment](docs/security/README.md) for
 source references, screenshot context and tests still requiring execution.
+
+## Remote syslog
+
+The 1.9.1 source now includes **System → Logging → Remote syslog** with a Cisco-style
+severity threshold (0–7), TCP/TLS, certificate verification, a bounded persistent
+queue and a test message. Forwarding is off by default and excludes serial
+transcripts. See [configuration, delivery limits and distribution status](docs/SYSLOG.md).
