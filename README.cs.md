@@ -225,3 +225,10 @@ Aktivní cesta relace nevolá redakční writer; na popisky „aktivní redakce�
 „obousměrný přepis“ proto nespoléhejte jako na záruku. Pokud se nesmí ukládat
 obsah terminálu, ponechte Pouze události. Podrobnosti a dosud nevyhodnocené
 testy jsou v [bezpečnostních podkladech](docs/security/README.md).
+
+## Vzdálený syslog
+
+Zdroje 1.9.1 obsahují **Systém → Logování → Vzdálený syslog**: práh severity 0–7
+jako u síťových prvků, TCP/TLS s ověřením certifikátu, omezenou trvalou frontu
+a testovací zprávu. Výchozí stav je vypnuto; sériové přepisy se neodesílají.
+[Nastavení, omezení doručení a stav distribuce](docs/SYSLOG.md).

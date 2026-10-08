@@ -169,6 +169,8 @@ for target in \
     /usr/local/sbin/consolepi-validate-generic-image \
     /usr/local/lib/consolepi_firstboot_security.py \
     /usr/local/lib/consolepi_boot_network.py \
+    /usr/local/lib/consolepi_syslog.py \
+    /etc/systemd/system/consolepi-syslog.service \
     /usr/share/consolepi/consolepi-network.txt \
     /etc/systemd/system/consolepi-boot-network.service \
     /usr/local/lib/consolepi_imager_security.py \
@@ -282,6 +284,14 @@ install -m 0755 "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" /usr/loca
 install -m 0755 "$ROOT/usr/local/sbin/consolepi-validate-generic-image" /usr/local/sbin/consolepi-validate-generic-image
 install -m 0644 "$ROOT/usr/local/lib/consolepi_firstboot_security.py" /usr/local/lib/consolepi_firstboot_security.py
 install -m 0644 "$ROOT/usr/local/lib/consolepi_boot_network.py" /usr/local/lib/consolepi_boot_network.py
+install -m 0644 "$ROOT/usr/local/lib/consolepi_syslog.py" /usr/local/lib/consolepi_syslog.py
+install -m 0644 "$ROOT/etc/systemd/system/consolepi-syslog.service" /etc/systemd/system/consolepi-syslog.service
+install -d -m 0700 /var/lib/consolepi-syslog
+if [ ! -e /etc/consolepi/syslog.json ]; then
+    printf '%s\n' '{"enabled":false,"host":"","port":6514,"transport":"tls","severity":6,"ca_pem":""}' >/etc/consolepi/syslog.json
+    chmod 0600 /etc/consolepi/syslog.json
+fi
+
 install -m 0644 "$ROOT/usr/share/consolepi/consolepi-network.txt" /usr/share/consolepi/consolepi-network.txt
 install -m 0644 "$ROOT/etc/systemd/system/consolepi-boot-network.service" /etc/systemd/system/consolepi-boot-network.service
 install -m 0644 "$ROOT/usr/local/lib/consolepi_imager_security.py" /usr/local/lib/consolepi_imager_security.py
@@ -502,6 +512,15 @@ fi
 systemctl enable ssh
 systemctl reload ssh
 systemctl daemon-reload
+# Preserve forwarding on updates; disabled by default on clean installation.
+python3 - <<'SYSLOGPY'
+import json, subprocess
+from pathlib import Path
+p = Path('/etc/consolepi/syslog.json')
+if p.exists() and json.loads(p.read_text()).get('enabled'):
+    subprocess.run(['systemctl', 'enable', '--now', 'consolepi-syslog'], check=True)
+    subprocess.run(['systemctl', 'restart', 'consolepi-syslog'], check=True)
+SYSLOGPY
 systemctl enable nginx consolepi-web consolepi-port-monitor
 if [ "$AVAHI_AVAILABLE" = yes ]; then
     systemctl enable avahi-daemon

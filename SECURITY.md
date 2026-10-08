@@ -32,3 +32,12 @@ implementation. Both `output` and `full` use `picocom` output logging; the
 active path does not apply the redaction writer. Device output may contain
 credentials, echoed input or configuration. Keep events-only logging when
 terminal content must not be retained.
+
+## Optional remote syslog
+
+[Remote event forwarding](docs/SYSLOG.md) is disabled by default. TLS verifies the
+server certificate and identity. Serial transcripts are excluded, but event
+metadata requires controlled server access and retention. A bounded queue can
+lose messages when full; successful TCP submission does not prove durable server
+storage. Factory reset and generic-image sanitization clear the destination,
+custom CA and pending events.

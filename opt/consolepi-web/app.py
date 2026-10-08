@@ -511,6 +511,23 @@ def authentication_status():
     return json.loads(result.stdout)
 
 
+def syslog_status():
+    result = command("sudo", "/usr/local/sbin/consolepi-control", "syslog", "status")
+    if result.returncode:
+        return {"enabled": False, "host": "", "port": 6514, "transport": "tls",
+                "severity": 6, "ca_pem": "", "pending": None, "dropped": None,
+                "running": False, "state": "unavailable", "last_sent": "",
+                "error": "Stav syslogu není dostupný.",
+                "levels": ["Emergency", "Alert", "Critical", "Error", "Warning", "Notice", "Informational", "Debug"]}
+    return json.loads(result.stdout)
+
+
+def web_audit(event, severity="info"):
+    # Fixed fields only: never log supplied passwords, forms, or headers.
+    command("logger", "-p", "authpriv." + severity, "-t", "consolepi-web-audit",
+            "--", event + " client=" + str(setup_client_address() or request.remote_addr or "unknown"))
+
+
 def logging_status():
     result = command(
         "sudo", "/usr/local/sbin/consolepi-control", "logs", "status"
@@ -659,11 +676,13 @@ def login():
     if request.method == "POST":
         expected = AUTH_FILE.read_text().strip()
         if check_password_hash(expected, request.form.get("password", "")):
+            web_audit("WEB_LOGIN_SUCCESS")
             session.clear()
             session.permanent = False
             session["authenticated"] = True
             session["csrf"] = secrets.token_urlsafe(32)
             return redirect(url_for("admin_dashboard"))
+        web_audit("WEB_LOGIN_FAILURE", "warning")
         flash("Nesprávné heslo.", "error")
     return render_template("login.html")
 
@@ -932,6 +951,7 @@ def system_page():
         "system.html",
         system=system_status(),
         logging=logging_status(),
+        syslog=syslog_status(),
         updates=update_status(),
         time_info=maintenance_status("time"),
         storage=maintenance_status("storage"),
@@ -1187,6 +1207,28 @@ def system_factory_reset():
         )
         return redirect(url_for("system_page", section="maintenance"))
     return render_template("factory_reset.html", **json.loads(result.stdout))
+
+
+@APP.post("/system/syslog")
+@authenticated
+def system_syslog():
+    if not session.get("csrf") or not csrf_valid():
+        return "Neplatný CSRF token.", 403
+    action = request.form.get("action", "configure")
+    if action not in {"configure", "test"}:
+        return "Nepovolená operace.", 400
+    payload = {"enabled": request.form.get("enabled") == "on",
+               "host": request.form.get("host", ""),
+               "port": request.form.get("port", "6514"),
+               "transport": request.form.get("transport", "tls"),
+               "severity": request.form.get("severity", "6"),
+               "ca_pem": request.form.get("ca_pem", "")}
+    result = command("sudo", "/usr/local/sbin/consolepi-control", "syslog", action,
+                     input_text=json.dumps(payload) if action == "configure" else None)
+    message = (json.loads(result.stdout).get("message", "Uloženo.")
+               if result.returncode == 0 else result.stderr.strip())
+    flash(message, "success" if result.returncode == 0 else "error")
+    return redirect(url_for("system_page", section="logs"))
 
 
 @APP.post("/system/logging")
