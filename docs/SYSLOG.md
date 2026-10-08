@@ -78,6 +78,10 @@ server, vlastní CA a čekající události; generic validátor kontroluje vypnu
 
 Diagnostika na zařízení:
 
+Bezpečnostní dokumenty a [akceptační sešit](security/README.md) obsahují
+podrobné scénáře 11–22 a obrazovou referenci S17. Výsledky zůstávají
+nevyhodnocené do doložení ověření na konkrétním RPi a přijímajícím serveru.
+
 ```sh
 sudo consolepi-control syslog status
 sudo systemctl status consolepi-syslog --no-pager
