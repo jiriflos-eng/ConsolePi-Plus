@@ -2,6 +2,24 @@
 
 Modul je v administraci pod `/ping`. Přepínač **Zapnout monitorování** je také přímo na hlavním přehledu. Po instalaci je sběr vypnutý. Vypnutí zachová zařízení a historii; běžící sonda se může dokončit, její výsledek se při vypnutém sběru nezapíše. Služba zůstává spuštěná a kontroluje přepínač jednou za sekundu, takže web nepotřebuje oprávnění pro systemctl.
 
+## Rychlé nastavení od verze 2.0.0
+
+1. Přihlaste se do administrace, zapněte Ping Monitor a otevřete jeho nastavení.
+2. Zvolte **Přidat zařízení**, vyplňte název a IP/hostname. Pro začátek ponechte
+   interval 30 s, timeout 1 s a jednu sondu. Otazník u každého pole vysvětlí význam.
+3. Uložte zařízení. Přehled otevřete tlačítkem **Otevřít přehled**; dlaždice
+   a TOP tabulky jsou na úvodním dashboardu pod Sériovými konzolemi.
+4. Kliknutím na dlaždici otevřete historii. Zvolte časový rozsah; najetím myši
+   zjistíte přesný čas a hodnotu. Grafy packet loss a jitteru mají gradient
+   v barvě křivky. Nulová hodnota nemá pod osou žádnou výplň.
+5. Vypnutí modulu zachová data a skryje veřejný přehled. Po zapnutí se evidovaná
+   mezera ukáže žlutě; výpadek zařízení se odlišuje světle červenou.
+
+Předběžný image 2.0.0 neobsahuje cíle, historii ani přístupové údaje. Sběr je
+výchozí vypnutý. Sanitizace zastaví sběrač a odstraní celý obsah jeho datového
+adresáře včetně SQLite WAL/SHM, incidentů a intervalů vypnutí. Nejde o postup
+pro běžnou aktualizaci: ta provozní data zachovává.
+
 ## Instalace a aktualizace
 
 Použijte standardní `install.sh` nebo podepsaný aktualizační balíček. Čistá instalace instaluje `fping`; offline aktualizace nové balíčky nestahuje. Na starších systémech se použije dostupný Linux `iputils-ping`, pokud fping chybí. Bez obou programů vzniká UNKNOWN s chybou, nikoliv DOWN. Pro doporučený režim na starším systému nainstalujte `fping` z repozitáře distribuce nebo z důvěryhodného offline balíčku.
@@ -45,7 +63,7 @@ SQLite používá WAL, busy_timeout=10 s a indexy. Zápisy výsledků všech dok
 
 Každá agregace obsahuje min/max s původními časy, součty RTT, počty úspěchů, ztrát a neznámých měření a jitter součty/počty. Po odstranění raw zůstane minimum a maximum každého uchovaného intervalu, **ne každý původní jednotlivý vzorek nebo každá menší špička**. Samostatná tabulka peaks uchovává všechny špičky splňující detekční práh po 730 dní.
 
-Live graf používá nejvýše přibližně 600 bucketů. Rozsahy od 48 hodin používají podle šířky grafu 24–96 bucketů, každý nejvýše se dvěma skutečnými extrémy. Krátká historie čerpá raw, delší předagregované úrovně; měsíc a rok vycházejí z denních agregací. Při širším rozsahu se několik dní může sloučit do jednoho zobrazovaného intervalu; zachovají se jeho skutečná minima/maxima s původními časy a doplňková typická latence. Při přiblížení se zobrazí jemnější intervaly. Bucketování je ukotvené k UTC, první a poslední bucket mohou přesahovat požadovanou hranici. Pořadí extrémů je chronologické. Graf nepřipojuje intervaly se ztrátami, UNKNOWN či delším odstupem, ztráty a incidenty odlišuje podbarvením. Lze přepnout RTT, packet loss a jitter, vybrat až čtyři zařízení, přiblížit a posunout čas. Canvas renderer je lokální, bez CDN a dalších závislostí. Tooltip ukazuje přesný čas zaznamenané sondy, nikoliv střed bucketu.
+Live graf používá nejvýše přibližně 600 bucketů. Rozsahy od 48 hodin používají podle šířky grafu 24–96 bucketů, každý nejvýše se dvěma skutečnými extrémy. Krátká historie čerpá raw, delší předagregované úrovně; měsíc a rok vycházejí z denních agregací. Při širším rozsahu se několik dní může sloučit do jednoho zobrazovaného intervalu; zachovají se jeho skutečná minima/maxima s původními časy a doplňková typická latence. Při přiblížení se zobrazí jemnější intervaly. Bucketování je ukotvené k UTC, první a poslední bucket mohou přesahovat požadovanou hranici. Pořadí extrémů je chronologické. Graf nepřipojuje intervaly se ztrátami, UNKNOWN či delším odstupem, ztráty a incidenty odlišuje podbarvením. Detail obsahuje RTT, packet loss a jitter; čas lze přiblížit a posunout. Canvas renderer je lokální, bez CDN a dalších závislostí. Tooltip ukazuje přesný čas zaznamenané sondy, nikoliv střed bucketu.
 
 Alarmy RTT, ztrát a délky potvrzeného výpadku zapisují pouze změny stavu do tabulky alarms. Ta je odděleným zdrojem událostí pro budoucí doručovací adaptér (e-mail/Telegram/webhook); doručování v této verzi není implementováno. Údržba potlačuje nové alarmy do konce zvoleného okna (UI nabízí hodinu i plánované datum od/do; API `maintenance_start` a `maintenance_until` jsou UTC epochy). Stávající aktivní alarmy jsou během údržby skryté. Potvrzení incidentu nezastaví sběr.
 

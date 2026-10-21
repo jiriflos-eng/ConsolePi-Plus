@@ -279,6 +279,8 @@ if [ "$detached_run" != yes ]; then
 fi
 
 destructive=yes
+# Stop the collector before deleting SQLite/WAL and device configuration.
+systemctl stop consolepi-ping.service || fail 'nelze zastavit Ping Monitor'
 install -m 0600 "$prep_dir/recovery.txt" "$RECOVERY"
 rm -f "$STATE_DIR/generic-image-validation.json"
 systemctl disable --now ssh nginx consolepi-web consolepi-port-monitor \
@@ -301,6 +303,15 @@ passwd -l console >/dev/null 2>&1 || true
 rm -f "$STATE_DIR/generic-imager-customization-failed" "$STATE_DIR/generic-imager-customization-imported" \
     "$STATE_DIR/.generic-imager-ssh-operation" "$STATE_DIR/.generic-imager-user-operation" \
     "$STATE_DIR/generic-imager-audit.jsonl" "$STATE_DIR/generic-recovery-active"
+
+# Ping targets, history, alarm state and pause timestamps belong to the device.
+install -d -o consolepi-web -g consolepi-web -m 0700 /var/lib/consolepi-ping
+python3 - <<'PINGCLEAN'
+import sys
+sys.path.insert(0, "/usr/local/lib")
+from consolepi_imager_security import clear_directory
+clear_directory("/var/lib/consolepi-ping")
+PINGCLEAN
 
 # Remove external audit destinations, trust material and queued events.
 /usr/local/sbin/consolepi-control syslog reset >/dev/null || fail 'nelze vyčistit syslog'

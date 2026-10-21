@@ -24,7 +24,7 @@ function draw(canvas,metric){
  ctx.fillStyle='rgba(232,193,67,.18)';for(const [a,b] of bands)ctx.fillRect(x(a),top,x(b)-x(a),plotH);
  for(const i of history.incidents){ctx.fillStyle='rgba(219,91,105,.14)';const a=Math.max(start,i.start),b=Math.min(finish,i.end||finish);ctx.fillRect(x(a),top,x(b)-x(a),plotH);}
  if(metric==='rtt')for(const b of history.buckets)if(b.losses){ctx.fillStyle='#cf929b99';ctx.fillRect(x(b.bucket),top,Math.max(3,plotW*history.bucket_size/(finish-start)),4);}
- const gradient=ctx.createLinearGradient(0,top,0,top+plotH);gradient.addColorStop(0,color+'26');gradient.addColorStop(1,color+'03');
+ const gradient=ctx.createLinearGradient(0,y(Math.max(.001,...points.map(p=>p.value))),0,y(0));gradient.addColorStop(0,color+(metric==='rtt'?'26':'38'));gradient.addColorStop(1,color+'03');
  let previous=null;
  for(const p of points){const b=p.bucket,px=x(p.ts),py=y(p.value),gap=b.unknowns||(metric==='rtt'&&b.losses);
    if(previous&&!pausedBetween(previous.ts,p.ts)&&!gap&&!previous.gap&&p.ts-previous.ts<=Math.max(history.bucket_size*1.6,65)){

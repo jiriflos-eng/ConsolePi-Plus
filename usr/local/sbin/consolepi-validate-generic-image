@@ -113,6 +113,18 @@ check failure_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/gen
 check success_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/generic-imager-customization-imported"
 check audit_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/generic-imager-audit.jsonl"
 check recovery_active_absent sh -c 'test ! -e "$1" && test ! -L "$1"' sh "$STATE_DIR/generic-recovery-active"
+check ping_data_empty python3 -c 'from pathlib import Path; p=Path("/var/lib/consolepi-ping"); assert p.is_dir() and not p.is_symlink() and not any(p.iterdir())'
+# systemctl is-active returns success when ignored inside an offline chroot.
+# Inspect its real process namespace instead; fail closed if proc is unavailable.
+check ping_collector_stopped python3 -c '
+from pathlib import Path
+assert Path("/proc/self/cmdline").is_file(), "proc is not mounted"
+for entry in Path("/proc").iterdir():
+    if not entry.name.isdigit(): continue
+    try: args=(entry/"cmdline").read_bytes().split(b"\0")
+    except (FileNotFoundError, ProcessLookupError): continue
+    assert not any(arg.rsplit(b"/",1)[-1] == b"ping_monitor.py" for arg in args), "Ping collector is running"
+'
 check syslog_disabled python3 -c 'import sys; sys.path.insert(0,"/usr/local/lib"); from consolepi_syslog import load, DEFAULTS; assert load() == DEFAULTS'
 check syslog_queue_absent sh -c 'test ! -e /var/lib/consolepi-syslog/queue.sqlite3'
 check syslog_service_disabled sh -c '! systemctl is-enabled --quiet consolepi-syslog.service'

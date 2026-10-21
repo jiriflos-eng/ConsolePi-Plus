@@ -774,11 +774,26 @@ def test_imager_key_and_firstrun(root):
     expect_failure(imager_security.provision_host_keys, generated, os.getuid(), os.getgid(), fail_sshd)
 
 
+def test_ping_state_cleanup(root):
+    state = root / "consolepi-ping"; state.mkdir(mode=0o700)
+    for name in ("monitor.sqlite3", "monitor.sqlite3-wal", "monitor.sqlite3-shm", "collector.lock"):
+        (state / name).write_bytes(b"private device data")
+    outside = root / "outside"; outside.mkdir()
+    (outside / "keep").write_text("unrelated data")
+    (state / "link").symlink_to(outside, target_is_directory=True)
+    imager_security.clear_directory(state)
+    assert not any(state.iterdir())
+    assert (outside / "keep").read_text() == "unrelated data"
+    unsafe = root / "unsafe-state"; unsafe.symlink_to(outside, target_is_directory=True)
+    expect_failure(imager_security.clear_directory, unsafe)
+
+
 def main():
     os.umask(0o022)
     with tempfile.TemporaryDirectory() as directory:
         root = pathlib.Path(directory)
         state_root = root / "states"; state_root.mkdir(); test_states(state_root)
+        test_ping_state_cleanup(root)
         test_management_networks()
         firewall_root = root / "bootstrap-firewall"; firewall_root.mkdir(); test_generic_bootstrap_firewall(firewall_root)
         update_root = root / "update"; update_root.mkdir(); test_generic_update_and_validation_report(update_root)

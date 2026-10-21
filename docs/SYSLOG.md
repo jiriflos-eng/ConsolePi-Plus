@@ -1,4 +1,4 @@
-# ConsolePi+ 1.9.1 – vzdálený syslog
+# ConsolePi+ 2.0.0 – vzdálený syslog
 
 Nastavení je v **Systém → Logování → Vzdálený syslog**. Výchozí stav je vypnuto.
 Zadejte server (DNS jméno nebo IPv4/IPv6), port, transport a severity. Doporučený
@@ -69,7 +69,7 @@ server, vlastní CA a čekající události; generic validátor kontroluje vypnu
 ## Ověření
 
 1. Uložte zapnuté nastavení s odpovídající CA a portem.
-2. Klikněte na **Odeslat testovací zprávu**. `SYSLOG_TEST version=1.9.1` používá
+2. Klikněte na **Odeslat testovací zprávu**. `SYSLOG_TEST version=2.0.0` používá
    právě nastavenou severity, aby test prošel filtrem.
 3. Ověřte přijetí na serveru. Zpráva webu potvrzuje lokální zapsání události,
    nikoli vzdálené uložení.
@@ -91,5 +91,6 @@ sudo journalctl -u consolepi-syslog -n 50 --no-pager
 ## Distribuce
 
 Syslog je rozšíření zdrojů 1.9.1. Původní image a archivy vydané 2. 10. 2026
-jej neobsahují. Aktualizované distribuční soubory lze označit za ověřené až po
-instalaci a testu na RPi; změna zdrojů sama již zapsanou SD kartu neaktualizuje.
+jej neobsahují. Syslog je součástí předběžného image a archivů 2.0.0. Nový image čeká na
+fyzický první start a reboot na RPi; změna zdrojů sama již zapsanou SD kartu
+neaktualizuje.

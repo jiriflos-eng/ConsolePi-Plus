@@ -18,9 +18,14 @@
 - Ověřeno na RPi3: automatické testy, IPv4/IPv6, DNS chyba, nedostupný cíl,
   více sond, přepínač, restart sběrače a krátká zátěž 32 konfigurací.
   Podrobnosti a omezení: [Ping Monitor](docs/PING-MONITOR.md).
-- Toto je verze zdrojového kódu. Image, Imager manifest ani podepsaný
-  aktualizační balíček 2.0.0 dosud nejsou publikované. Dlouhodobý test,
-  reboot a odezva fyzické sériové konzole zůstávají k ověření.
+- Předběžné vydání 2.0.0 obsahuje sanitizovaný image, Imager manifest,
+  instalátor, zdrojový archiv a SHA-256. Čistý obraz nemá zařízení, historii,
+  přihlašovací údaje ani klíče konkrétního RPi; Ping Monitor je vypnutý.
+- Grafy jitteru a packet loss mají gradient v barvě křivky. Evidované vypnutí
+  sběru je světle žluté, potvrzený výpadek světle červený.
+- Nový image čeká na fyzický první start a reboot z nově zapsané SD.
+  Dlouhodobý test a fyzická sériová konzole zůstávají k ověření.
+  Podepsaný aktualizační balíček 2.0.0 se nevydává; stabilní latest zůstává 1.9.1.
 
 # ConsolePi+ 1.9.1 · Offline Ethernet IPv4 provisioning
 

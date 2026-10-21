@@ -2,10 +2,11 @@
 
 Source documentation for **ConsolePi+ 2.0.0**, including the new [Ping Monitor](docs/PING-MONITOR.md).
 
-The published ready-to-flash image and installation archives are still
-[version 1.9.1](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1).
-A 2.0.0 image, Imager manifest and signed update package have not been published.
-The screenshots below document the earlier 1.9.1 interface.
+The [2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0)
+contains a sanitized generic image, Raspberry Pi Imager manifest, installer,
+source archive and SHA-256 checksums. The image awaits a fresh physical SD-card
+first-boot/reboot test; the stable `latest` release remains 1.9.1.
+No signed 2.0.0 application update is provided. The screenshots below show 1.9.1.
 
 ![ConsolePi+ 1.9.1 administration overview](docs/screenshots/1.9.1/01-prehled.jpg)
 
@@ -40,23 +41,23 @@ available in English here and in Czech in [README.cs.md](README.cs.md).
 
 ## Ready-to-flash image with Raspberry Pi Imager
 
-[ConsolePi+ 1.9.1 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1)
-includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest).
+[ConsolePi+ 2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0)
+includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0/ConsolePi-Plus-2.0.0.rpi-imager-manifest).
 Open the downloaded manifest, or set its URL under Imager Settings → Content Repository → Edit.
 For a repository URL that follows the latest release, use:
 
     https://github.com/jiriflos-eng/ConsolePi-Plus/releases/latest/download/ConsolePi-Plus.rpi-imager-manifest
 
-The version-specific manifest above stays pinned to 1.9.1.
-Select Raspberry Pi 3, ConsolePi+ 1.9.1 and the SD card, then enable key-only SSH with one Ed25519 public key.
+The version-specific manifest above stays pinned to 2.0.0.
+Select Raspberry Pi 3, ConsolePi+ 2.0.0 and the SD card, then enable key-only SSH with one Ed25519 public key.
 For static Ethernet IPv4, edit `consolepi-network.txt` on the boot partition after flashing and before the first boot.
 See [the installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt) for SSH-only customization and recovery.
 
 ## Quick installation on Raspberry Pi OS Lite
 
 Download the matching installer first from
-[ConsolePi-Plus-1.9.1-install.tar.gz](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz).
-Its [SHA-256 checksum](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz.sha256) is
+[ConsolePi-Plus-2.0.0-install.tar.gz](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0/ConsolePi-Plus-2.0.0-install.tar.gz).
+Its [SHA-256 checksum](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0/ConsolePi-Plus-2.0.0-install.tar.gz.sha256) is
 published alongside it.
 
 1. Use Raspberry Pi Imager to write **Raspberry Pi OS Lite (64-bit)** to the
@@ -78,13 +79,13 @@ published alongside it.
 
 4. Copy the release bundle to the `consolepi` home directory:
 
-       scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-1.9.1-install.tar.gz consolepi@PI_ADDRESS:~/
+       scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-2.0.0-install.tar.gz consolepi@PI_ADDRESS:~/
 
 5. Log in again and run the bootstrap installer:
 
        install_dir="$HOME/consolepi-install"
        mkdir -p "$install_dir"
-       tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.1-install.tar.gz" -C "$install_dir"
+       tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-2.0.0-install.tar.gz" -C "$install_dir"
        cd "$install_dir"
        ./bootstrap-install.sh
 
@@ -213,14 +214,31 @@ source references, screenshot context and tests still requiring execution.
 
 ## Remote syslog
 
-The 1.9.1 source now includes **System → Logging → Remote syslog** with a Cisco-style
+Version 2.0.0 includes **System → Logging → Remote syslog** with a Cisco-style
 severity threshold (0–7), TCP/TLS, certificate verification, a bounded persistent
 queue and a test message. Forwarding is off by default and excludes serial
 transcripts. See [configuration, delivery limits and distribution status](docs/SYSLOG.md).
 
 ## Ping Monitor
 
-Device configuration is available at `/ping`; the enabled monitor appears on the landing dashboard with device tiles and TOP tables. Installation, API, retention, hardware validation and operational limits: [Czech documentation](docs/PING-MONITOR.md).
+[Image validation and pending acceptance checks](docs/RELEASE-2.0.0.md).
+
+Enable **Ping Monitor** in administration, open `/ping` and add a name and
+IP address or hostname. Start with a 30-second interval, one probe and a
+1-second timeout. Collection is disabled in a clean image and no targets or
+history are supplied.
+
+The landing dashboard shows green device tiles with miniature graphs and TOP
+tables for highest RTT, most outages and packet loss. Click a tile for latency,
+packet-loss and jitter graphs with fading fills, 60-minute/48-hour/30-day/year
+ranges and zoom. Long-range reduction retains measured extrema and their times.
+Pastel yellow marks recorded collection pauses; pastel red marks confirmed
+outages. Zero packet loss lies on the axis and has no area to fill.
+
+Administration contains configuration only: tooltips, pause/maintenance controls
+and CSV import/export. The enabled dashboard and details are publicly readable;
+configuration and device addresses require authentication. See [setup, statistics,
+retention and operational limits](docs/PING-MONITOR.md).
 
 ## Building the 2.0.0 installer from source
 
@@ -231,5 +249,4 @@ From a reviewed source checkout, run:
 With VERSION set to 2.0.0, this creates
 `dist/ConsolePi-Plus-2.0.0-install.tar.gz` and its SHA-256 file locally.
 This command does not publish a GitHub release, build a ready-to-flash image,
-or create a signed application update. Use the existing 1.9.1 download links
-only when you intend to install that earlier published distribution.
+or create a signed application update. Download the corresponding assets from the version-specific 2.0.0 prerelease.
