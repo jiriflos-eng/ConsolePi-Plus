@@ -20,8 +20,8 @@
     for(const d of list){
       const row=element('tr',null,body),name=element('td',null,row);element('strong',d.name,name);if(d.description)element('small',d.description,name);
       element('td',d.address,row).className='pa-address';const groupCell=element('td',d.group_name||'Bez skupiny',row);groupCell.className='pa-cell-muted';if(d.tags)element('small',d.tags,groupCell);const measure=element('td',fmt(d.interval)+' s',row);element('small',d.probes+' sond'+(d.probes===1?'a':d.probes<5?'y':''),measure);
-      const collectionState=!monitorEnabled?'Sběr vypnutý':d.paused?'Pozastaveno':!collectorHealthy?'Sběrač neodpovídá':d.maintenance_start<=Date.now()/1000&&d.maintenance_until>Date.now()/1000?'Údržba':'Aktivní';
-      element('span',collectionState,element('td',null,row)).className='pa-state'+(!monitorEnabled||d.paused||!collectorHealthy?' pa-paused':'');
+      const collectionState=!monitorEnabled?'Vypnutý':d.paused?'Pozastaveno':!collectorHealthy?'Sběrač neodpovídá':d.maintenance_start<=Date.now()/1000&&d.maintenance_until>Date.now()/1000?'Údržba':'Aktivní';
+      element('span',collectionState,element('td',null,row)).className='pa-state'+(!monitorEnabled?' pa-disabled':d.paused||!collectorHealthy?' pa-paused':'');
       const actions=element('div',null,element('td',null,row));actions.className='pa-row-actions';button(actions,'Upravit',()=>edit(d));
       button(actions,d.paused?'Obnovit':'Pozastavit',async()=>{await api('devices/'+d.id,{paused:d.paused?0:1});await refresh();});
       button(actions,d.maintenance_until>Date.now()/1000?'Ukončit údržbu':'Údržba 1 h',async()=>{await api('devices/'+d.id,{maintenance_start:0,maintenance_until:d.maintenance_until>Date.now()/1000?0:Date.now()/1000+3600});await refresh();});

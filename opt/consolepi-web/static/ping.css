@@ -6,3 +6,5 @@
 .pa-field-label{display:flex;align-items:center;gap:7px;min-height:18px}.pa-field-label label{font:inherit;line-height:1.5}#ping-app .pa-help{display:inline-flex;flex:0 0 17px;align-items:center;justify-content:center;width:17px;height:17px;min-height:0;padding:0;border:1px solid var(--muted);border-radius:50%;background:transparent;color:var(--muted);font:700 10px/1 system-ui,sans-serif;cursor:help;opacity:.8}#ping-app .pa-help:hover,#ping-app .pa-help[aria-expanded=true]{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);opacity:1}.pa-tooltip{position:fixed;z-index:1000;width:310px;max-width:calc(100vw - 24px);padding:13px 15px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font-size:12px;font-weight:400;line-height:1.65;box-shadow:0 9px 30px #0002;overflow-y:auto;max-height:calc(100dvh - 24px)}
 
 @media(pointer:coarse){#ping-app .pa-help{width:24px;height:24px;flex-basis:24px}}
+
+.pa-state.pa-disabled{color:var(--danger);background:var(--danger-soft)}
