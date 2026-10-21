@@ -101,3 +101,5 @@ Tento přehled a detail jsou dle zadání dostupné i před přihlášením. Rea
 Administrace `/ping` nyní obsahuje pouze konfiguraci zařízení, přepínač sběru, import/export a údržbu. Grafy, statistické žebříčky a historii zobrazuje úvodní dashboard a detail `/ping/view/ID`. Autentizovaný GET `/ping/api/devices` poskytuje lehký seznam konfigurací bez výpočtu historických statistik.
 
 Historická API přijímají volitelné `buckets=1..1000` jako rozpočet zobrazovaných intervalů. Bez parametru platí od 48 hodin 96 intervalů, u kratších rozsahů 600. Velikost bucketu se zarovnává na uchovanou agregační úroveň. Redukce je pouze pro zobrazení: původní retenční agregace a významné špičky se nemění.
+
+Grafy podbarvují evidované vypnutí sběru a pozastavení zařízení jemně žlutě, potvrzené výpadky světle červeně. Tooltip uvádí začátek a konec intervalu. Křivka nepřemosťuje vypnutý sběr. Intervaly se evidují od migrace databáze na verzi 2; starší neznámé mezery se zpětně neoznačují jako vypnutí. Vypnutí není ztracená sonda a neovlivňuje počty ztrát.

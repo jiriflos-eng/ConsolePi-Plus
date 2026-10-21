@@ -23,6 +23,35 @@ class StoreTests(unittest.TestCase):
         self.patcher.stop();self.temp.cleanup()
     def record(self,values):
         with m.database() as db:m.record(db,self.id,values)
+    def test_collection_pause_intervals_and_device_scope(self):
+        with m.database() as db:
+            db.execute('DELETE FROM collection_pauses')
+            m.set_enabled(db,True,self.now)
+            m.set_enabled(db,False,self.now+10)
+            m.set_enabled(db,False,self.now+15)
+            m.set_enabled(db,True,self.now+20)
+            other=m.save_device(db,dict(name='Other',address='192.0.2.2'))
+            with patch.object(m.time,'time',return_value=self.now+30):
+                m.save_device(db,dict(name='Router',address='192.0.2.1',paused=True),self.id)
+            with patch.object(m.time,'time',return_value=self.now+40):
+                m.save_device(db,dict(name='Router',address='192.0.2.1',paused=False),self.id)
+            result=m.history(db,self.id,self.now,self.now+60)
+            self.assertEqual(result['pauses'],[
+                dict(start=self.now+10,end=self.now+20,reason='disabled'),
+                dict(start=self.now+30,end=self.now+40,reason='paused')])
+            self.assertEqual(len(m.history(db,other,self.now,self.now+60)['pauses']),1)
+            self.assertEqual(result['buckets'],[])
+
+    def test_v1_migration_preserves_devices_and_is_idempotent(self):
+        with m.database() as db:
+            db.execute('DROP TABLE collection_pauses')
+            db.execute('PRAGMA user_version=1')
+        m.migrate();m.migrate()
+        with m.database() as db:
+            self.assertEqual(db.execute('PRAGMA user_version').fetchone()[0],2)
+            self.assertEqual(db.execute('SELECT name FROM devices WHERE id=?',(self.id,)).fetchone()[0],'Router')
+            self.assertEqual(db.execute('SELECT count(*) FROM collection_pauses WHERE end IS NULL').fetchone()[0],1)
+
     def test_peak_preservation_and_retention(self):
         times=[self.now+i for i in range(5)]
         self.record([(t,'ok',v,'') for t,v in zip(times,[8,9,10,450,12])])

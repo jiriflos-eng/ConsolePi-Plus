@@ -43,11 +43,12 @@ def migrate(path=None):
     with database(path) as db:
         db.execute('PRAGMA journal_mode=WAL')
         version = db.execute('PRAGMA user_version').fetchone()[0]
-        if version > 1:
+        if version > 2:
             raise RuntimeError('Nepodporovaná verze databáze')
-        if version == 1:
+        if version == 2:
             return
-        db.executescript('''
+        if version == 0:
+            db.executescript('''
         CREATE TABLE config (key TEXT PRIMARY KEY, value TEXT NOT NULL);
         INSERT INTO config VALUES ('enabled','false');
         CREATE TABLE devices (
@@ -82,10 +83,47 @@ def migrate(path=None):
         CREATE INDEX alarms_device_ts ON alarms(device_id,ts);
         PRAGMA user_version=1;
         ''')
+        db.executescript('''
+        BEGIN IMMEDIATE;
+        CREATE TABLE IF NOT EXISTS collection_pauses (
+          id INTEGER PRIMARY KEY, device_id INTEGER REFERENCES devices ON DELETE CASCADE,
+          start REAL NOT NULL, end REAL, reason TEXT NOT NULL CHECK(reason IN ('disabled','paused')));
+        CREATE UNIQUE INDEX IF NOT EXISTS collection_pause_open ON collection_pauses(IFNULL(device_id,0)) WHERE end IS NULL;
+        CREATE INDEX IF NOT EXISTS collection_pause_time ON collection_pauses(start,end);
+        PRAGMA user_version=2;
+        COMMIT;
+        ''')
+        # Earlier switch times were not recorded. Seed only the state known now.
+        now = time.time()
+        if not enabled(db):
+            collection_pause(db,None,True,now)
+        for row in db.execute('SELECT id FROM devices WHERE paused=1').fetchall():
+            collection_pause(db,row['id'],True,now)
+
 
 
 def enabled(db):
     return db.execute("SELECT value FROM config WHERE key='enabled'").fetchone()[0] == 'true'
+
+
+def collection_pause(db, device_id, active, now=None):
+    ts = time.time() if now is None else now
+    if active:
+        db.execute('INSERT OR IGNORE INTO collection_pauses(device_id,start,reason) VALUES (?,?,?)',
+                   (device_id,ts,'disabled' if device_id is None else 'paused'))
+    else:
+        db.execute('UPDATE collection_pauses SET end=? WHERE device_id IS ? AND end IS NULL',(ts,device_id))
+
+
+def set_enabled(db, on, now=None):
+    if enabled(db) == on:
+        return
+    ts = time.time() if now is None else now
+    collection_pause(db,None,not on,ts)
+    db.execute("UPDATE config SET value=? WHERE key='enabled'", ('true' if on else 'false',))
+    db.execute("UPDATE devices SET state='UNKNOWN',failures=0,successes=0,fail_start=NULL")
+    db.execute("UPDATE incidents SET end_reason='monitoring_gap',end=(SELECT last_ts FROM devices WHERE devices.id=incidents.device_id) WHERE end IS NULL")
+    db.execute("INSERT INTO alarms(device_id,ts,kind,active,detail) SELECT a.device_id,?,a.kind,0,'Změna nastavení sběru' FROM alarms a WHERE active=1 AND id=(SELECT max(b.id) FROM alarms b WHERE b.device_id=a.device_id AND b.kind=a.kind)", (ts,))
 
 
 def validate(data):
@@ -139,13 +177,16 @@ def save_device(db, data, device_id=None):
         if db.execute('SELECT count(*) FROM devices').fetchone()[0] >= 128:
             raise ValueError('Limit 128 zařízení')
         keys = ','.join(values)
-        return db.execute(f"INSERT INTO devices ({keys}) VALUES ({','.join('?' for _ in values)})", tuple(values.values())).lastrowid
+        saved = db.execute(f"INSERT INTO devices ({keys}) VALUES ({','.join('?' for _ in values)})", tuple(values.values())).lastrowid
+        collection_pause(db,saved,bool(values['paused']))
+        return saved
     if not db.execute('SELECT id FROM devices WHERE id=?', (device_id,)).fetchone():
         raise ValueError('Zařízení neexistuje')
     db.execute("UPDATE incidents SET end_reason='monitoring_gap',end=(SELECT last_ts FROM devices WHERE id=?) WHERE device_id=? AND end IS NULL", (device_id,device_id))
     for kind in ('rtt','loss','down'):
         alarm(db,device_id,kind,False,time.time(),'Změna konfigurace')
     db.execute('UPDATE devices SET ' + ','.join(k+'=?' for k in values) + ',state=\'UNKNOWN\', failures=0,successes=0,fail_start=NULL WHERE id=?', (*values.values(), device_id))
+    collection_pause(db,device_id,bool(values['paused']))
     return device_id
 
 
@@ -233,6 +274,7 @@ def cleanup(db, now):
     db.execute('DELETE FROM samples WHERE ts<?', (now-7*86400,))
     for resolution, retention in RESOLUTIONS:
         db.execute('DELETE FROM aggregates WHERE resolution=? AND bucket<?', (resolution,now-retention))
+    db.execute('DELETE FROM collection_pauses WHERE end IS NOT NULL AND end<?', (now-730*86400,))
     for table, column in [('peaks','ts'),('incidents','start'),('alarms','ts')]:
         extra = ' AND end IS NOT NULL' if table == 'incidents' else ''
         db.execute(f'DELETE FROM {table} WHERE {column}<?{extra}', (now-730*86400,))
@@ -319,7 +361,8 @@ def history(db, device_id, start, end, limit=None):
         b['jitter'] = b['jitter_sum']/b['jitter_n'] if b['jitter_n'] else None
         result.append(b)
     incidents = [dict(r) for r in db.execute('SELECT * FROM incidents WHERE device_id=? AND start<? AND (end IS NULL OR end>=?) ORDER BY start DESC LIMIT 500',(device_id,end,start))]
-    return dict(buckets=result,resolution=resolution,bucket_size=bucket_size,start=start,end=end,incidents=incidents)
+    pauses = [dict(r) for r in db.execute('SELECT start,end,reason FROM collection_pauses WHERE (device_id IS NULL OR device_id=?) AND start<? AND (end IS NULL OR end>?) ORDER BY start',(device_id,end,start))]
+    return dict(buckets=result,resolution=resolution,bucket_size=bucket_size,start=start,end=end,incidents=incidents,pauses=pauses)
 
 
 def probe(device):

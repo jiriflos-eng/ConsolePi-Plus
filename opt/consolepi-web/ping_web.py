@@ -135,10 +135,7 @@ def register(app, authenticated):
         if type(data.get('enabled')) is not bool:
             raise ValueError('enabled musí být boolean')
         with monitor.database() as db:
-            db.execute("UPDATE config SET value=? WHERE key='enabled'", ('true' if data['enabled'] else 'false',))
-            db.execute("UPDATE devices SET state='UNKNOWN',failures=0,successes=0,fail_start=NULL")
-            db.execute("UPDATE incidents SET end_reason='monitoring_gap',end=(SELECT last_ts FROM devices WHERE devices.id=incidents.device_id) WHERE end IS NULL")
-            db.execute("INSERT INTO alarms(device_id,ts,kind,active,detail) SELECT a.device_id,?,a.kind,0,'Změna nastavení sběru' FROM alarms a WHERE active=1 AND id=(SELECT max(b.id) FROM alarms b WHERE b.device_id=a.device_id AND b.kind=a.kind)", (time.time(),))
+            monitor.set_enabled(db,data['enabled'])
         return jsonify(enabled=data['enabled'])
 
     @bp.route('/ping/api/devices', methods=['GET','POST'])
