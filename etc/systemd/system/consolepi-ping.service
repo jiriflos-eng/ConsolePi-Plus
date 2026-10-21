@@ -1,0 +1,33 @@
+[Unit]
+Description=ConsolePi+ ICMP Ping Monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=consolepi-web
+Group=consolepi-web
+WorkingDirectory=/opt/consolepi-web
+ExecStart=/usr/bin/python3 /opt/consolepi-web/ping_monitor.py
+StateDirectory=consolepi-ping
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_NET_RAW
+AmbientCapabilities=CAP_NET_RAW
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+Nice=10
+CPUQuota=20%
+MemoryMax=96M
+TasksMax=24
+
+[Install]
+WantedBy=multi-user.target

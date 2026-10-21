@@ -119,8 +119,10 @@ python3 -c 'import ast, pathlib; ast.parse(pathlib.Path(
     "'"$ROOT"'/usr/local/sbin/consolepi-snmp-pass-persist").read_text())' &&
     ok "ConsolePi SNMP exporter Python syntax" || bad "ConsolePi SNMP exporter Python syntax"
 
+python3 "$ROOT/tests/ping_behavior.py" || bad "ping engine and peak preservation"
 python3 "$ROOT/tests/syslog_behavior.py" || bad "syslog forwarding behavior"
 if python3 -c 'import flask, cryptography' >/dev/null 2>&1; then
+    python3 "$ROOT/tests/ping_web_behavior.py" || bad "ping API security and administration"
     python3 "$ROOT/tests/syslog_web_behavior.py" || bad "syslog web security and templates"
 else
     printf '%s\n' 'SKIP: Flask/cryptography unavailable (syslog web tests)'

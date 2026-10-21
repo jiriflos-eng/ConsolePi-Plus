@@ -1,4 +1,9 @@
-# ConsolePi+ 1.9.1 – instalace na nový Raspberry Pi 3
+# ConsolePi+ 2.0.0 – správa a instalace na Raspberry Pi 3
+
+Zdrojový kód je ve verzi **2.0.0** s novým [Ping Monitorem](docs/PING-MONITOR.md).
+Hotový image a instalační archivy zveřejněné na GitHubu jsou zatím **1.9.1**;
+image, Imager manifest a podepsaný aktualizační balíček 2.0.0 dosud nejsou
+publikované. Níže uvedené odkazy a historické snímky proto zůstávají pro 1.9.1.
 
 ![ConsolePi+ 1.9.1 – administrační přehled](docs/screenshots/1.9.1/01-prehled.jpg)
 
@@ -232,3 +237,13 @@ Zdroje 1.9.1 obsahují **Systém → Logování → Vzdálený syslog**: práh s
 jako u síťových prvků, TCP/TLS s ověřením certifikátu, omezenou trvalou frontu
 a testovací zprávu. Výchozí stav je vypnuto; sériové přepisy se neodesílají.
 [Nastavení, omezení doručení a stav distribuce](docs/SYSLOG.md).
+
+## Ping Monitor
+
+ICMP monitoring v administraci `/ping`, s přepínačem na hlavním přehledu. Instalace, API, retence a provozní limity: [docs/PING-MONITOR.md](docs/PING-MONITOR.md).
+
+### Lokální sestavení instalátoru 2.0.0
+
+Z ověřeného zdrojového checkoutu spusťte `./tools/build-install-bundle.sh`.
+Vznikne `dist/ConsolePi-Plus-2.0.0-install.tar.gz` a SHA-256 soubor. Jde o lokální
+instalační archiv, nikoliv o zveřejněný image nebo podepsanou aktualizaci.

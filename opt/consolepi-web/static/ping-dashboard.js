@@ -1,0 +1,5 @@
+'use strict';
+(()=>{const box=document.querySelector('#ping-dashboard'),toggle=box.querySelector('input'),status=box.querySelector('[role=status]');
+async function load(){try{const response=await fetch('/ping/api/overview');if(!response.ok||response.redirected)throw Error('Monitoring není dostupný');const data=await response.json();toggle.checked=data.enabled;toggle.disabled=false;status.textContent=data.enabled?`${data.devices.length} zařízení · ${data.counts.UP} UP · ${data.counts.DOWN} DOWN · ${data.counts.DEGRADED} DEGRADED${data.healthy?'':' · služba neodpovídá'}`:'Vypnuto';}catch(e){status.textContent=e.message;}}
+toggle.onchange=async()=>{toggle.disabled=true;try{const response=await fetch('/ping/api/settings',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':box.dataset.csrf},body:JSON.stringify({enabled:toggle.checked})});if(!response.ok)throw Error('Změna se nepodařila');await load();}catch(e){toggle.checked=!toggle.checked;status.textContent=e.message;toggle.disabled=false;}};
+load();setInterval(()=>{if(!document.hidden&&!toggle.disabled)load();},15000);})();

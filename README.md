@@ -1,6 +1,11 @@
 # ConsolePi+
 
-Documentation for **ConsolePi+ 1.9.1** ([release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1)).
+Source documentation for **ConsolePi+ 2.0.0**, including the new [Ping Monitor](docs/PING-MONITOR.md).
+
+The published ready-to-flash image and installation archives are still
+[version 1.9.1](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v1.9.1).
+A 2.0.0 image, Imager manifest and signed update package have not been published.
+The screenshots below document the earlier 1.9.1 interface.
 
 ![ConsolePi+ 1.9.1 administration overview](docs/screenshots/1.9.1/01-prehled.jpg)
 
@@ -17,6 +22,9 @@ The web interface currently ships in Czech. The public documentation is
 available in English here and in Czech in [README.cs.md](README.cs.md).
 
 ## Features
+
+- continuous ICMP Ping Monitor with persistent history, peak-preserving graphs,
+  public read-only device tiles/TOP tables and authenticated device settings;
 
 - SSH administration on port `22` and restricted serial-console sessions on
   ports `2201`–`2204`;
@@ -209,3 +217,19 @@ The 1.9.1 source now includes **System → Logging → Remote syslog** with a Ci
 severity threshold (0–7), TCP/TLS, certificate verification, a bounded persistent
 queue and a test message. Forwarding is off by default and excludes serial
 transcripts. See [configuration, delivery limits and distribution status](docs/SYSLOG.md).
+
+## Ping Monitor
+
+Device configuration is available at `/ping`; the enabled monitor appears on the landing dashboard with device tiles and TOP tables. Installation, API, retention, hardware validation and operational limits: [Czech documentation](docs/PING-MONITOR.md).
+
+## Building the 2.0.0 installer from source
+
+From a reviewed source checkout, run:
+
+    ./tools/build-install-bundle.sh
+
+With VERSION set to 2.0.0, this creates
+`dist/ConsolePi-Plus-2.0.0-install.tar.gz` and its SHA-256 file locally.
+This command does not publish a GitHub release, build a ready-to-flash image,
+or create a signed application update. Use the existing 1.9.1 download links
+only when you intend to install that earlier published distribution.

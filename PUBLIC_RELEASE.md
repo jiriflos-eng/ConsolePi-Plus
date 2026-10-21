@@ -1,7 +1,9 @@
 # ConsolePi+ public release checklist
 
 The public repository is [jiriflos-eng/ConsolePi-Plus](https://github.com/jiriflos-eng/ConsolePi-Plus),
-licensed under [MIT](LICENSE). The current release is **1.9.1**. Use this
+licensed under [MIT](LICENSE). The current source version is **2.0.0**; the
+latest published image/archive release remains **1.9.1** until the new assets
+are built and validated. Use this
 checklist for subsequent publication; repository creation and license selection
 have already been completed.
 

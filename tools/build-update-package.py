@@ -17,7 +17,7 @@ from pathlib import Path
 # Build artefacts must never become part of an update payload.  In particular,
 # including dist/ would needlessly inflate the upload and could exceed nginx's
 # request-size limit on a Raspberry Pi.
-EXCLUDED_PARTS = {".git", ".private", "__pycache__", "releases", "dist"}
+EXCLUDED_PARTS = {".git", ".private", "__pycache__", "releases", "dist", "outputs", "downloads", "dist-public"}
 EXCLUDED_NAMES = {
     ".DS_Store", "authorized_keys", "release-signing-private.pem", "release-signing-private.pem.pub",
 }

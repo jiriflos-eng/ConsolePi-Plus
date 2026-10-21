@@ -7,6 +7,7 @@ import platform
 import re
 import secrets
 import shutil
+import sys
 import subprocess
 from datetime import datetime, timezone
 from io import BytesIO
@@ -1957,6 +1958,11 @@ def download_snmp_mib():
         return "MIB soubor zatím není nainstalován.", 404
     return send_file(SNMP_MIB_FILE, as_attachment=True, download_name="CONSOLEPI-MIB.txt", mimetype="text/plain")
 
+
+# Shared session, HTTPS and first-boot gate also protect the Ping blueprint.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from ping_web import register as register_ping
+register_ping(APP, authenticated)
 
 if __name__ == "__main__":
     APP.run(host="127.0.0.1", port=8080)

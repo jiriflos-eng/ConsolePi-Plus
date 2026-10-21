@@ -21,5 +21,6 @@
   <a class="tab{% if active_page == 'network' %} active{% endif %}" data-tab="network" href="{{ url_for('admin_dashboard', tab='network') }}">Síť</a>
   <a class="tab{% if active_page == 'authentication' %} active{% endif %}" href="{{ url_for('authentication_page') }}">Autentizace</a>
   <a class="tab{% if active_page == 'system' %} active{% endif %}" href="{{ url_for('system_page') }}">Systém</a>
+  <a class="tab{% if active_page == 'ping' %} active{% endif %}" href="{{ url_for('ping.page') }}">Ping Monitor</a>
   <a class="tab{% if active_page == 'help' %} active{% endif %}" href="{{ url_for('help_page') }}">Nápověda</a>
 </nav>

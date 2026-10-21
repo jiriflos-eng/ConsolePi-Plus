@@ -1,3 +1,27 @@
+# ConsolePi+ 2.0.0 · Ping Monitor
+
+- Kontinuální ICMP monitoring v samostatné službě `consolepi-ping.service`,
+  SQLite/WAL, verzované schéma, agregace a retenční úklid.
+- Úvodní dashboard zobrazuje při zapnutém modulu zelené dlaždice s historií
+  a TOP přehledy nejvyšších RTT, počtu incidentů a packet loss.
+- Detail zařízení nabízí grafy latence, ztrát a jitteru, časové rozsahy,
+  přiblížení a historii incidentů. Min/Max downsampling uchovává skutečné
+  extrémy včetně původních časů i po odstranění raw vzorků.
+- Administrace obsahuje pouze správu zařízení: přehledný formulář, kontextovou
+  nápovědu u všech 17 polí, CSV import/export, pauzu a plánovanou údržbu.
+- Přepínač monitoru v administraci; stávající autentizace a CSRF pro změny.
+  Read-only přehled a detail jsou při zapnutém modulu dostupné také před
+  přihlášením; konfigurační údaje a adresy zařízení veřejné API nevrací.
+- Instalátor zahrnuje službu, migraci a fping; starší offline instalace mohou
+  použít iputils-ping. Neotevírá se nový port a nemění se SSH ani firewall.
+- Součástí zdrojů je i dřívější rozšíření vzdáleného syslogu popsané níže.
+- Ověřeno na RPi3: automatické testy, IPv4/IPv6, DNS chyba, nedostupný cíl,
+  více sond, přepínač, restart sběrače a krátká zátěž 32 konfigurací.
+  Podrobnosti a omezení: [Ping Monitor](docs/PING-MONITOR.md).
+- Toto je verze zdrojového kódu. Image, Imager manifest ani podepsaný
+  aktualizační balíček 2.0.0 dosud nejsou publikované. Dlouhodobý test,
+  reboot a odezva fyzické sériové konzole zůstávají k ověření.
+
 # ConsolePi+ 1.9.1 · Offline Ethernet IPv4 provisioning
 
 - Generic images include `consolepi-network.txt` on the visible boot partition.

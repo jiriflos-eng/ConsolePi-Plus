@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Detail zařízení · Ping Monitor · ConsolePi+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static',filename='ping-overview.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='ping-detail.css') }}">
+<section class="public-dashboard pm-detail" data-ping-detail="{{ device_id }}">
+  <header class="public-header"><a class="brand brand-with-logo public-brand" href="/">{% include '_brand.html' %}</a><div class="public-actions"><a class="admin-link" href="{{ url_for('ping.page',device_id=device_id) }}">Správa</a><button class="theme-toggle ghost" type="button" data-theme-toggle aria-label="Přepnout denní a noční režim"><span aria-hidden="true">◐</span><span data-theme-label>Režim</span></button></div></header>
+  <a class="pm-back" href="/">← Zpět na přehled</a>
+  <div class="pm-detail-heading"><div><p class="pm-eyebrow">PING MONITOR / DETAIL ZAŘÍZENÍ</p><h1 data-pd-name>Načítání zařízení…</h1><p data-pd-status class="pm-subtitle"></p></div><div class="pm-current"><strong data-pd-current>—</strong><span>Aktuální odezva · ms</span></div></div>
+  <p class="notice error" data-pd-error hidden role="alert"></p>
+  <div class="pm-detail-stats" data-pd-stats></div>
+  <div class="pm-chart-toolbar"><div class="pm-ranges" role="group" aria-label="Časový rozsah"><button data-range="3600" class="active">60 minut</button><button data-range="172800">48 hodin</button><button data-range="2592000">30 dní</button><button data-range="31536000">1 rok</button></div><div class="pm-time-nav"><button data-pd-back aria-label="Starší období">←</button><button data-pd-forward aria-label="Novější období">→</button><button data-pd-zoom>Přiblížit +</button><button data-pd-live>Nyní</button></div></div>
+  <section class="pm-chart-card"><div class="pm-chart-title"><div><h2>Odezva v čase</h2><span>Skutečná minima a maxima · ms</span></div><div class="pm-legend"><span>● Latence</span><span class="pm-loss-key">● Ztracené sondy</span><span class="pm-incident-key">● Incident</span></div></div><canvas data-pd-latency aria-label="Historie latence v milisekundách" role="img"></canvas><p class="pm-chart-tooltip" data-pd-tooltip>Pro přesný čas a hodnotu přesuňte ukazatel nad graf.</p></section>
+  <div class="pm-secondary-charts"><section class="pm-chart-card"><div class="pm-chart-title"><div><h2>Packet loss</h2><span>Podíl ztracených relevantních sond · %</span></div></div><canvas data-pd-loss aria-label="Historie ztrátovosti v procentech" role="img"></canvas></section><section class="pm-chart-card"><div class="pm-chart-title"><div><h2>Jitter</h2><span>Kolísání sousedních úspěšných odezev · ms</span></div></div><canvas data-pd-jitter aria-label="Historie jitteru v milisekundách" role="img"></canvas></section></div>
+  <section class="pm-chart-card"><div class="pm-chart-title"><div><h2>Historie výpadků</h2><span>Potvrzené incidenty za zvolené období</span></div></div><div class="pm-incident-list" data-pd-incidents></div></section>
+  <p class="pm-update" data-pd-updated></p><p class="pm-update">Mezery ve sběru se nepropojují. Nedostupnost není RTT 0 ms. Průměr doplňuje denní extrémy, nikdy je nenahrazuje. Změny nastavení jsou dostupné pouze v administraci.</p>
+</section>
+<script defer src="{{ url_for('static',filename='ping-detail.js') }}"></script>
+{% endblock %}

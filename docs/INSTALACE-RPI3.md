@@ -1,5 +1,9 @@
 # ConsolePi+ 1.9.1: čistá instalace na Raspberry Pi 3
 
+> Zdrojová verze projektu je nyní 2.0.0. Níže uvedené zveřejněné archivy a postup
+> instalace image se vztahují k 1.9.1; hotové distribuční soubory 2.0.0 zatím
+> nejsou publikované. Ping Monitor: [instalace a přejímka](PING-MONITOR.md).
+
 Pro standardní zápis hotového ConsolePi+ použijte
 [návod pro generic image a manifest Imageru](INSTALACE-IMAGE-RPI-IMAGER.txt).
 Tento postup je alternativní instalace na čistý Raspberry Pi OS Lite (64-bit).
@@ -71,7 +75,7 @@ zdroj. Jinou management síť lze určit pomocí
 `./bootstrap-install.sh --management-cidr 10.176.122.0/24`.
 
 Při vlastním sestavení ze zdrojů použijte `./tools/build-install-bundle.sh`;
-výstup pro VERSION 1.9.1 je `dist/ConsolePi-Plus-1.9.1-install.tar.gz`.
+výstup pro aktuální VERSION 2.0.0 je `dist/ConsolePi-Plus-2.0.0-install.tar.gz`.
 
 ## 4. Dokončení ve webovém průvodci
 

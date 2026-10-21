@@ -17,7 +17,8 @@ and publish the fix and advisory once users can update safely.
 
 ## Supported releases
 
-The current supported release is **1.9.1**. Only the latest released version
+The current source version is **2.0.0**. Published image/archive assets remain
+**1.9.1** until a validated 2.0.0 distribution is released. Only the latest released version
 should be treated as supported. Application update packages must be signed
 with the release administrator's offline/private signing key. Published source,
 installer and image archives have SHA-256 checksums; checksums alone are not signatures.
@@ -41,3 +42,15 @@ metadata requires controlled server access and retention. A bounded queue can
 lose messages when full; successful TCP submission does not prove durable server
 storage. Factory reset and generic-image sanitization clear the destination,
 custom CA and pending events.
+
+
+## Ping Monitor in 2.0.0
+
+Configuration and mutations reuse ConsolePi+ authentication and CSRF protection.
+When enabled, the landing-page tiles, rankings and device graphs are intentionally
+readable without login by clients already permitted by the existing web firewall.
+The public API exposes names, states and measurements; it excludes device
+addresses, configuration descriptions, thresholds and subprocess error messages.
+Disabling the module hides the overview and denies public history/detail access.
+Names and measurements can reveal network information: enable the monitor only
+where this visibility is intended. See [the operational documentation](docs/PING-MONITOR.md).
