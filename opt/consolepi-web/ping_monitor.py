@@ -271,13 +271,17 @@ def overview(db, start, end):
                 database_bytes=sum(p.stat().st_size for p in DB_PATH.parent.glob('monitor.sqlite3*') if p.is_file()))
 
 
-def history(db, device_id, start, end, limit=600):
+def history(db, device_id, start, end, limit=None):
     duration = end-start
+    if limit is None:
+        limit = 96 if duration >= 48*3600 else 600
     resolution = 0 if start >= time.time()-7*86400 and duration <= 3600 else 60 if start >= time.time()-30*86400 else 300 if start >= time.time()-90*86400 else 3600
     bucket_size = max(resolution or 1, math.ceil(duration/max(1,min(limit,1000))))
     if duration >= 28*86400:
         resolution = 86400
         bucket_size = max(bucket_size,86400)
+    if resolution:
+        bucket_size = math.ceil(bucket_size/resolution)*resolution
     buckets = {}
     if resolution == 0:
         source = db.execute('SELECT ts,outcome,rtt FROM samples WHERE device_id=? AND ts>=? AND ts<? ORDER BY ts,id', (device_id,start,end))

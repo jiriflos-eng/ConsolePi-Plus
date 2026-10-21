@@ -56,6 +56,18 @@ def register(app, authenticated):
             raise ValueError('Období musí být 1 sekunda až 1 rok v uchované historii')
         return start,end
 
+    def history_limit():
+        value = request.args.get('buckets')
+        if value is None:
+            return None
+        try:
+            value = int(value)
+        except (ValueError,TypeError):
+            raise ValueError('Neplatný počet intervalů grafu')
+        if not 1 <= value <= 1000:
+            raise ValueError('Počet intervalů grafu musí být 1–1000')
+        return value
+
     def public_device(d):
         # Explicit read-only projection; configuration, addresses and raw errors stay private.
         return {k:d[k] for k in ('id','name','state','rtt','last_ok','stats')}
@@ -95,7 +107,7 @@ def register(app, authenticated):
         with monitor.database() as db:
             if not monitor.enabled(db) or not db.execute('SELECT id FROM devices WHERE id=?',(device_id,)).fetchone():
                 abort(404)
-            data = monitor.history(db,device_id,start,end)
+            data = monitor.history(db,device_id,start,end,limit=history_limit())
             # Incidents are display-only: acknowledgement remains authenticated and CSRF protected.
             data['incidents'] = [{k:r[k] for k in ('start','end','end_reason','failures')} for r in data['incidents']]
             response = jsonify(data)
@@ -154,7 +166,7 @@ def register(app, authenticated):
     def history(device_id):
         start,end = period()
         with monitor.database() as db:
-            return jsonify(monitor.history(db,device_id,start,end))
+            return jsonify(monitor.history(db,device_id,start,end,limit=history_limit()))
 
     @bp.get('/ping/api/events')
     def events():

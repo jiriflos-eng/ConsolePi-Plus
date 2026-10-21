@@ -66,6 +66,17 @@ class ApiTests(unittest.TestCase):
         with m.database() as db:db.execute("UPDATE config SET value='false' WHERE key='enabled'")
         self.assertEqual(self.client.get('/ping/public/history/'+str(id),base_url='https://localhost').status_code,404)
 
+    def test_history_bucket_budget(self):
+        with m.database() as db:
+            id=m.save_device(db,dict(name='Router',address='::1'))
+            db.execute("UPDATE config SET value='true' WHERE key='enabled'")
+        path='/ping/public/history/'+str(id)+'?period=172800&buckets='
+        for invalid in ['0','1001','nan','1.5']:
+            self.assertEqual(self.client.get(path+invalid,base_url='https://localhost').status_code,400)
+        response=self.client.get(path+'24',base_url='https://localhost')
+        self.assertEqual(response.status_code,200)
+        self.assertGreaterEqual(response.json['bucket_size'],7200)
+
     def test_configuration_list_requires_auth_and_omits_history(self):
         self.assertEqual(self.client.get('/ping/api/devices').status_code,302)
         self.auth()

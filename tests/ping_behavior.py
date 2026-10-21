@@ -38,6 +38,22 @@ class StoreTests(unittest.TestCase):
             with patch.object(m.time,'time',return_value=self.now+8*86400):
                 archived=m.history(db,self.id,self.now-1,self.now+10,limit=1)
             self.assertIn((times[3],450),[p for b in archived['buckets'] for p in b['points']])
+    def test_long_history_reduces_points_and_preserves_peak_time(self):
+        base=self.now-4*3600
+        peak_ts=base+127*60
+        self.record([(base+i*60,'ok',450 if i==127 else 8+i%5,'') for i in range(240)])
+        with m.database() as db:
+            detailed=m.history(db,self.id,self.now-48*3600,self.now+1,limit=600)
+            reduced=m.history(db,self.id,self.now-48*3600,self.now+1)
+            narrow=m.history(db,self.id,self.now-48*3600,self.now+1,limit=24)
+            for result in (reduced,narrow):
+                self.assertIn((peak_ts,450),[p for b in result['buckets'] for p in b['points']])
+                self.assertEqual(sum(b['successes'] for b in result['buckets']),240)
+                self.assertTrue(all(b['points']==sorted(b['points']) for b in result['buckets']))
+            self.assertLess(len(reduced['buckets']),len(detailed['buckets'])/3)
+            self.assertLessEqual(len(narrow['buckets']),len(reduced['buckets']))
+            self.assertEqual(reduced['bucket_size']%reduced['resolution'],0)
+
     def test_multiple_peaks_loss_and_unknown(self):
         self.record([(self.now+i,'ok',v,'') for i,v in enumerate([8,450,10,700,12])]+[(self.now+6,'timeout',None,''),(self.now+7,'dns',None,'')])
         with m.database() as db:

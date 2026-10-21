@@ -27,9 +27,9 @@ function draw(canvas,metric){
      ctx.fillStyle=gradient;ctx.beginPath();ctx.moveTo(x(previous.ts),y(previous.value));ctx.lineTo(px,py);ctx.lineTo(px,y(0));ctx.lineTo(x(previous.ts),y(0));ctx.closePath();ctx.fill();
      ctx.strokeStyle=color;ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(x(previous.ts),y(previous.value));ctx.lineTo(px,py);ctx.stroke();
    }
-   ctx.fillStyle=color;ctx.beginPath();ctx.arc(px,py,points.length>300?1.3:2.4,0,2*Math.PI);ctx.fill();previous={...p,gap};
+   ctx.fillStyle=color;ctx.beginPath();ctx.arc(px,py,finish-start>=172800?1.4:points.length>300?1.3:2.4,0,2*Math.PI);ctx.fill();previous={...p,gap};
  }
- if(metric==='rtt'&&history.resolution===86400){ctx.strokeStyle='#778b96';ctx.setLineDash([4,4]);let prev=null;for(const b of history.buckets){if(b.typical_rtt==null||b.unknowns||b.losses){prev=null;continue;}const p=[b.first_ts,b.typical_rtt];if(prev&&p[0]-prev[0]<172800){ctx.beginPath();ctx.moveTo(x(prev[0]),y(prev[1]));ctx.lineTo(x(p[0]),y(p[1]));ctx.stroke();}prev=p;}ctx.setLineDash([]);}
+ if(metric==='rtt'&&history.resolution===86400){ctx.strokeStyle='#778b96';ctx.setLineDash([4,4]);let prev=null;for(const b of history.buckets){if(b.typical_rtt==null||b.unknowns||b.losses){prev=null;continue;}const p=[b.first_ts,b.typical_rtt];if(prev&&p[0]-prev[0]<Math.max(172800,history.bucket_size*1.6)){ctx.beginPath();ctx.moveTo(x(prev[0]),y(prev[1]));ctx.lineTo(x(p[0]),y(p[1]));ctx.stroke();}prev=p;}ctx.setLineDash([]);}
  ctx.restore();
  if(!points.length){ctx.fillStyle=muted;ctx.textAlign='center';ctx.fillText('V tomto období nejsou naměřená data',left+plotW/2,top+plotH/2);ctx.textAlign='left';}
  const base=ctx.getImageData(0,0,canvas.width,canvas.height);
@@ -40,7 +40,7 @@ function redraw(){draw($('[data-pd-latency]'),'rtt');draw($('[data-pd-loss]'),'l
 async function refresh(){
  if(busy)return;busy=true;
  try{
- const query=new URLSearchParams({period,...(end?{end}:{})}),[summary,data]=await Promise.all([get('/ping/public/summary?'+query),get('/ping/public/history/'+id+'?'+query)]),device=summary.devices.find(d=>d.id===id);
+ const query=new URLSearchParams({period,...(end?{end}:{})}),budget=period>=172800?Math.max(24,Math.min(96,Math.floor(root.clientWidth/10))):Math.max(100,Math.min(600,Math.floor(root.clientWidth))),[summary,data]=await Promise.all([get('/ping/public/summary?'+query),get('/ping/public/history/'+id+'?'+query+'&buckets='+budget)]),device=summary.devices.find(d=>d.id===id);
  if(!device)throw Error('Ping Monitor je vypnutý nebo zařízení bylo odstraněno.');history=data;
  $('[data-pd-name]').textContent=device.name;document.title=device.name+' · Ping Monitor · ConsolePi+';
  $('[data-pd-status]').textContent=labels[device.state]+' · poslední úspěch '+(device.last_ok?date(device.last_ok):'dosud nezměřeno');$('[data-pd-current]').textContent=['UP','DEGRADED'].includes(device.state)?fmt(device.rtt):device.state==='DOWN'?'Offline':'—';
