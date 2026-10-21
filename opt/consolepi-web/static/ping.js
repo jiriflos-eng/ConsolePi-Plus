@@ -1,7 +1,7 @@
 'use strict';
 (() => {
   const root=document.querySelector('#ping-app'),$=s=>root.querySelector(s),csrf=root.dataset.csrf;
-  let devices=[],busy=false,initialDevice=Number(root.dataset.device)||null;
+  let devices=[],monitorEnabled=false,collectorHealthy=false,busy=false,initialDevice=Number(root.dataset.device)||null;
   const error=e=>{const box=$('#ping-error');box.hidden=!e;box.textContent=e?String(e.message||e):'';};
   const fmt=v=>Number(v).toLocaleString('cs-CZ',{maximumFractionDigits:2});
   async function api(path,data,method='POST'){
@@ -20,7 +20,8 @@
     for(const d of list){
       const row=element('tr',null,body),name=element('td',null,row);element('strong',d.name,name);if(d.description)element('small',d.description,name);
       element('td',d.address,row).className='pa-address';const groupCell=element('td',d.group_name||'Bez skupiny',row);groupCell.className='pa-cell-muted';if(d.tags)element('small',d.tags,groupCell);const measure=element('td',fmt(d.interval)+' s',row);element('small',d.probes+' sond'+(d.probes===1?'a':d.probes<5?'y':''),measure);
-      element('span',d.paused?'Pozastaveno':d.maintenance_start<=Date.now()/1000&&d.maintenance_until>Date.now()/1000?'Údržba':'Aktivní',element('td',null,row)).className='pa-state'+(d.paused?' pa-paused':'');
+      const collectionState=!monitorEnabled?'Sběr vypnutý':d.paused?'Pozastaveno':!collectorHealthy?'Sběrač neodpovídá':d.maintenance_start<=Date.now()/1000&&d.maintenance_until>Date.now()/1000?'Údržba':'Aktivní';
+      element('span',collectionState,element('td',null,row)).className='pa-state'+(!monitorEnabled||d.paused||!collectorHealthy?' pa-paused':'');
       const actions=element('div',null,element('td',null,row));actions.className='pa-row-actions';button(actions,'Upravit',()=>edit(d));
       button(actions,d.paused?'Obnovit':'Pozastavit',async()=>{await api('devices/'+d.id,{paused:d.paused?0:1});await refresh();});
       button(actions,d.maintenance_until>Date.now()/1000?'Ukončit údržbu':'Údržba 1 h',async()=>{await api('devices/'+d.id,{maintenance_start:0,maintenance_until:d.maintenance_until>Date.now()/1000?0:Date.now()/1000+3600});await refresh();});
@@ -30,7 +31,7 @@
   }
   async function refresh(){
     if(busy)return;busy=true;
-    try{const data=await api('devices');devices=data.devices;$('#ping-enabled').checked=data.enabled;$('#ping-health').dataset.state=data.enabled?(data.healthy?'on':'error'):'off';$('#ping-health').textContent=data.enabled?(data.healthy?'Sběr běží':'Služba neodpovídá'):'Sběr vypnutý';
+    try{const data=await api('devices');devices=data.devices;monitorEnabled=data.enabled;collectorHealthy=data.healthy;$('#ping-enabled').checked=data.enabled;$('#ping-health').dataset.state=data.enabled?(data.healthy?'on':'error'):'off';$('#ping-health').textContent=data.enabled?(data.healthy?'Sběr běží':'Služba neodpovídá'):'Sběr vypnutý';
       const group=$('#ping-group'),value=group.value;group.replaceChildren(element('option','Všechny'));group.firstChild.value='';for(const g of [...new Set(devices.map(d=>d.group_name))].filter(Boolean).sort()){const o=element('option',g,group);o.value=g;}group.value=[...group.options].some(o=>o.value===value)?value:'';
       renderTable();if(initialDevice){const d=devices.find(d=>d.id===initialDevice);initialDevice=null;if(d)edit(d);}error(null);
     }catch(e){error(e);}finally{busy=false;}
