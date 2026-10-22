@@ -77,6 +77,16 @@ jednoho zařízení se nezměnila (ověřeno hashem), historie zůstala zachovan
 po restartu přibyly nové sondy; zařízení přešlo do UP. Test proběhl na r2
 s dodatečně opraveným certifikátem a aktualizovaným firstboot skriptem.
 
+## Krátké provozní doměření · 22. 10. 2026
+
+Na testovacím RPi3 s jedním zapnutým cílem během 35,1 s přibyly dvě sondy;
+zařízení zůstalo UP. Sběrač spotřeboval průměrně 1,24 % jednoho CPU jádra a
+16,4 MiB RSS. SSH, nginx, web i sběrač byly aktivní, HTTPS vracelo 200 bez
+přesměrování do průvodce a statický profil zůstal zachovaný. SQLite
+`PRAGMA quick_check` vrátilo `ok`. Teplota CPU byla přibližně 54,8 °C a firmware
+vrátil `throttled=0x0`. Jde o krátké provozní měření jednoho cíle, nikoli
+kapacitní ani dlouhodobý zátěžový test.
+
 ## Zbývající přejímka
 
 Je nutný nový distribuční build zahrnující opravu prvotního TLS certifikátu
