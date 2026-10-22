@@ -70,13 +70,20 @@ před vystavením certifikátu; regresní test pokrývá pozdější přidělen�
 i timeout. Tato dodatečná oprava není obsažena v již vydaných immutable
 souborech r2. Před stabilním vydáním je nutný nový build a jeho přejímka.
 
-## Dosud neprovedeno pro tento nový obraz
+Po dokončení webového průvodce prošel i řízený reboot tohoto testovacího RPi.
+Zůstal dokončený provisioning, statický síťový profil a HTTPS s plným ověřením
+certifikátu. SSH, nginx, web a Ping služba byly po startu aktivní. Konfigurace
+jednoho zařízení se nezměnila (ověřeno hashem), historie zůstala zachovaná a
+po restartu přibyly nové sondy; zařízení přešlo do UP. Test proběhl na r2
+s dodatečně opraveným certifikátem a aktualizovaným firstboot skriptem.
 
-Čerstvý zápis přes Raspberry Pi Imager, fyzický první boot, dokončení webového
-průvodce a následný reboot na RPi 3. Dále dlouhodobý zátěžový test a fyzická
-sériová konzole. Testy předchozího 1.9.1 obrazu ani testy modulu na běžícím
-RPi tyto kroky pro nový obraz nenahrazují.
+## Zbývající přejímka
 
-Proto je 2.0.0 označená jako **prerelease**; stabilní latest zůstává 1.9.1.
-Pro test 2.0.0 použijte pevný manifest přiložený k vydání, nikoli latest URL.
-Po úspěšné fyzické přejímce lze stejné vydání povýšit na stabilní.
+Je nutný nový distribuční build zahrnující opravu prvotního TLS certifikátu
+a jeho čerstvý první start a reboot. Provozní test opraveného RPi nenahrazuje
+ověření nového souboru image. Dlouhodobý zátěžový test a fyzická sériová konzole
+zůstávají samostatnými neprovedenými kroky.
+
+Vydání zůstává **prerelease**; stabilní latest je stále 1.9.1. Vydané soubory r2
+se zpětně nepřepisují. Před povýšením na stabilní verzi musí být ověřen build,
+který obsahuje všechny opravy.

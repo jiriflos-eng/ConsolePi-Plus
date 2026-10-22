@@ -4,7 +4,9 @@
   nezávisí na tom, zda NetworkManager stihl přidělit adresu před startem služby.
 - Regresní test ověřuje opožděné přidělení adresy i ukončení při timeoutu.
 - Na fyzicky spuštěném r2 bylo ověřeno SSH, aktivní služby a čistá Ping DB;
-  po obnovení certifikátu také HTTPS průvodce. Vydané soubory r2 se nemění.
+  po obnovení certifikátu také HTTPS průvodce. Po jeho dokončení prošel reboot,
+  zachování konfigurace/historie a pokračování sond (UP). Vydané soubory r2
+  se nemění; nový build s TLS opravou ještě čeká na přejímku.
 
 ## Oprava image 2.0.0-r2 · 22. října 2026
 
