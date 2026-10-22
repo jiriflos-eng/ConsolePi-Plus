@@ -16,8 +16,8 @@ a webové heslo. Soukromý SSH klíč správce zůstává na jeho počítači.
 - Ethernet do management sítě s DHCP;
 - Raspberry Pi Imager, SSH klient a vlastní veřejný klíč Ed25519;
 - dostupné zdroje APT nebo odpovídající proxy pro bootstrap;
-- [instalační archiv 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-install.tar.gz)
-  a jeho [SHA-256](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-install.tar.gz.sha256).
+- [instalační archiv 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-install.tar.gz)
+  a jeho [SHA-256](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-install.tar.gz.sha256).
 
 ## 1. Příprava OS a SSH
 

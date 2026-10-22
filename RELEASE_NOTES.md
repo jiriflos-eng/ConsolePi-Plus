@@ -1,3 +1,13 @@
+## Image 2.0.0-r3 · 22. října 2026
+
+- Čistý image zahrnuje opravu čekání na Ethernet IPv4 před vytvořením
+  HTTPS certifikátu i opravené povolení služeb při bootu.
+- Regresní test vystaví skutečný X.509 certifikát pro opožděnou testovací IP,
+  ověří IP SAN a odmítnutí vystavení při nedostupné adrese.
+- Verze aplikace zůstává 2.0.0. Nový image, manifest, instalační a zdrojový
+  archiv odpovídají stejnému zdrojovému commitu. Starší artefakty se nemění.
+- R3 je předběžná revize čekající na vlastní fyzický první start a reboot.
+
 ## Oprava firstboot HTTPS · 22. října 2026 (zdroje)
 
 - Před vystavením certifikátu se čeká na IPv4 rozhraní eth0; IP SAN už

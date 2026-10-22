@@ -816,6 +816,26 @@ printf '2: eth0 inet 192.0.2.5/24 brd 192.0.2.255 scope global eth0\n'
                             env=env, capture_output=True, text=True)
     assert result.returncode != 0 and not result.stdout
 
+    # Execute the real certificate-generation block with a delayed interface,
+    # then inspect the actual X.509 SAN. No production paths or keys are used.
+    begin = source.index('tls_ip=$(wait_for_ethernet_ipv4)')
+    end = source.index('\nchmod 0600', begin)
+    issue = source[begin:end]
+    for mode in ('delayed', 'unavailable'):
+        counter.unlink(missing_ok=True)
+        tls = root / ('tls-' + mode); tls.mkdir()
+        env.update(IP_TEST_MODE=mode, TLS_DIR=str(tls))
+        result = subprocess.run(['sh','-c',function+'\nfail() { exit 1; }\n'+issue],
+                                env=env, capture_output=True, text=True, timeout=20)
+        if mode == 'delayed':
+            assert result.returncode == 0, result
+            san = subprocess.check_output(['openssl','x509','-in',str(tls/'consolepi.crt'),
+                                           '-noout','-ext','subjectAltName'], text=True)
+            assert 'IP Address:192.0.2.5' in san, san
+        else:
+            assert result.returncode != 0
+            assert not (tls/'consolepi.crt').exists() and not (tls/'consolepi.key').exists()
+
 
 def main():
     os.umask(0o022)

@@ -1,7 +1,7 @@
 # ConsolePi+ 2.0.0 – správa a instalace na Raspberry Pi 3
 
 Zdrojový kód je ve verzi **2.0.0** s novým [Ping Monitorem](docs/PING-MONITOR.md).
-[Předběžné vydání 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r2)
+[Předběžné vydání 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
 obsahuje sanitizovaný image, Imager manifest, instalační a zdrojový archiv a
 SHA-256. Nový image ještě vyžaduje první start a reboot z čerstvě zapsané SD;
 stabilní `latest` zatím zůstává 1.9.1. Podepsaný aktualizační balíček 2.0.0 není
@@ -15,7 +15,7 @@ z testovacího RPi z 6. 10. 2026. Zobrazené adresy jsou příklady.
 
 ## Image 2.0.0 k ověření v Raspberry Pi Imageru
 
-Stáhněte a otevřete [manifest verze 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest),
+Stáhněte a otevřete [manifest verze 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-r3.rpi-imager-manifest),
 nebo jeho URL vložte do **Nastavení → Content Repository → Edit** a potvrďte
 **Apply & Restart**. URL sledující nejnovější vydání:
 

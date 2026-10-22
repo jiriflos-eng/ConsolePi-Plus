@@ -1,6 +1,24 @@
 # Image ConsolePi+ 2.0.0 — kontrola předběžného vydání
 
-Opravená revize image: **2.0.0-r2**, 22. 10. 2026. Verze aplikace: **2.0.0**. Cíl: Raspberry Pi 3 B/B+, arm64.
+Aktuální revize image: **2.0.0-r3**, 22. 10. 2026. Verze aplikace: **2.0.0**. Cíl: Raspberry Pi 3 B/B+, arm64.
+
+## Revize r3: úplná oprava prvotního HTTPS
+
+Revize r3 obsahuje opravu firstboot skriptu, který před vystavením HTTPS
+certifikátu počká na globální IPv4 rozhraní eth0. Zachovává opravený start
+služeb z r2, klíčovou autentizaci i podmínky úspěšného Imager provisioningu.
+Verze aplikace se nemění: **2.0.0**.
+
+Regresní test spouští skutečný blok vystavení certifikátu s opožděně
+přidělenou testovací IP a kontroluje IP SAN v hotovém X.509 certifikátu.
+Druhý scénář ověřuje timeout bez vytvoření certifikátu a klíče. Oba běží
+v dočasném adresáři; do distribučního obrazu žádné testovací klíče nevstupují.
+
+Obraz je sestaven z čistého offline základu, bez kopírování provozní SD karty.
+Validátor ověřuje povolené služby, prázdnou Ping DB, absentující identity,
+firstboot pending, konfiguraci bootu a syntaxe SSH/firewall/systemd. Nový r3
+soubor musí ještě projít čerstvým fyzickým prvním startem a rebootem; provozní
+výsledky opraveného r2 níže jsou samostatné a tento krok nenahrazují.
 
 ## Oprava prvního obrazu
 
@@ -89,11 +107,11 @@ kapacitní ani dlouhodobý zátěžový test.
 
 ## Zbývající přejímka
 
-Je nutný nový distribuční build zahrnující opravu prvotního TLS certifikátu
-a jeho čerstvý první start a reboot. Provozní test opraveného RPi nenahrazuje
-ověření nového souboru image. Dlouhodobý zátěžový test a fyzická sériová konzole
-zůstávají samostatnými neprovedenými kroky.
+Čistý r3 build už zahrnuje opravu prvotního TLS certifikátu. Zbývá jeho čerstvý
+zápis přes Imager, první start, dokončení průvodce a reboot na fyzickém RPi3.
+Provozní test opraveného r2 nenahrazuje ověření nového souboru image.
+Dlouhodobý zátěžový test a fyzická sériová konzole zůstávají samostatnými kroky.
 
-Vydání zůstává **prerelease**; stabilní latest je stále 1.9.1. Vydané soubory r2
-se zpětně nepřepisují. Před povýšením na stabilní verzi musí být ověřen build,
-který obsahuje všechny opravy.
+Vydání r3 zůstává **prerelease**; stabilní latest je stále 1.9.1. Starší vydané
+soubory se zpětně nepřepisují. Pro test použijte pevný manifest r3; na stabilní
+vydání lze povýšit až po ověření nového image.

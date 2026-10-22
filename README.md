@@ -2,7 +2,7 @@
 
 Source documentation for **ConsolePi+ 2.0.0**, including the new [Ping Monitor](docs/PING-MONITOR.md).
 
-The [2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r2)
+The [2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
 contains a sanitized generic image, Raspberry Pi Imager manifest, installer,
 source archive and SHA-256 checksums. The image awaits a fresh physical SD-card
 first-boot/reboot test; the stable `latest` release remains 1.9.1.
@@ -41,8 +41,8 @@ available in English here and in Czech in [README.cs.md](README.cs.md).
 
 ## Ready-to-flash image with Raspberry Pi Imager
 
-[ConsolePi+ 2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r2)
-includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest).
+[ConsolePi+ 2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
+includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-r3.rpi-imager-manifest).
 Open the downloaded manifest, or set its URL under Imager Settings → Content Repository → Edit.
 For a repository URL that follows the latest release, use:
 
@@ -56,8 +56,8 @@ See [the installation guide](docs/INSTALACE-IMAGE-RPI-IMAGER.txt) for SSH-only c
 ## Quick installation on Raspberry Pi OS Lite
 
 Download the matching installer first from
-[ConsolePi-Plus-2.0.0-install.tar.gz](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-install.tar.gz).
-Its [SHA-256 checksum](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-install.tar.gz.sha256) is
+[ConsolePi-Plus-2.0.0-install.tar.gz](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-install.tar.gz).
+Its [SHA-256 checksum](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-install.tar.gz.sha256) is
 published alongside it.
 
 1. Use Raspberry Pi Imager to write **Raspberry Pi OS Lite (64-bit)** to the
