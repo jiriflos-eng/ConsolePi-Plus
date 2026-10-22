@@ -24,6 +24,23 @@ fail()
     exit 1
 }
 
+# NetworkManager can acquire eth0 IPv4 after this oneshot starts. Do not issue
+# a hostname-only certificate (or select an unrelated interface's address).
+wait_for_ethernet_ipv4()
+{
+    attempt=0
+    while :; do
+        address=$(ip -o -4 address show dev eth0 scope global 2>/dev/null | awk 'NR==1 {print $4}')
+        if [ -n "$address" ]; then
+            printf '%s\n' "${address%/*}"
+            return 0
+        fi
+        attempt=$((attempt + 1))
+        [ "$attempt" -lt 31 ] || return 1
+        sleep 1
+    done
+}
+
 state=$(python3 - "$FIRSTBOOT" "$STATE" <<'PY'
 import sys
 sys.path.insert(0, "/usr/local/lib")
@@ -104,9 +121,9 @@ from consolepi_imager_security import provision_host_keys
 provision_host_keys()
 PY
 install -d -o root -g root -m 0755 "$TLS_DIR"
-tls_ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+tls_ip=$(wait_for_ethernet_ipv4) || fail 'ethernet IPv4 adresa není dostupná pro HTTPS certifikát'
 tls_san="DNS:$(hostname),DNS:$(hostname).local"
-[ -z "$tls_ip" ] || tls_san="$tls_san,IP:$tls_ip"
+tls_san="$tls_san,IP:$tls_ip"
 openssl req -x509 -newkey rsa:2048 -sha256 -nodes -days 825 \
     -subj "/CN=$(hostname)" -addext "subjectAltName=$tls_san" \
     -keyout "$TLS_DIR/consolepi.key" -out "$TLS_DIR/consolepi.crt" >/dev/null 2>&1

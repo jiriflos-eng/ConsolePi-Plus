@@ -1,3 +1,11 @@
+## Oprava firstboot HTTPS · 22. října 2026 (zdroje)
+
+- Před vystavením certifikátu se čeká na IPv4 rozhraní eth0; IP SAN už
+  nezávisí na tom, zda NetworkManager stihl přidělit adresu před startem služby.
+- Regresní test ověřuje opožděné přidělení adresy i ukončení při timeoutu.
+- Na fyzicky spuštěném r2 bylo ověřeno SSH, aktivní služby a čistá Ping DB;
+  po obnovení certifikátu také HTTPS průvodce. Vydané soubory r2 se nemění.
+
 ## Oprava image 2.0.0-r2 · 22. října 2026
 
 - Aplikace zůstává 2.0.0. První předběžný image měl kvůli chybě sestavení

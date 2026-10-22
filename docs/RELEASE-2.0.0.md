@@ -56,6 +56,20 @@ Veřejný soubor `IMAGE-VALIDATION.json` u vydání uvádí vazbu na zdrojový c
 kontrolní součty a stav jednotlivých kontrol. Lokální pracovní kopie a provozní
 data testovacího RPi nejsou součástí vydání.
 
+## Fyzický test r2 · 22. 10. 2026
+
+První boot opravené revize r2 na Raspberry Pi 3 úspěšně provedl Imager
+provisioning. SSH s klíčem správce, nginx, web a Ping sběrač byly aktivní.
+Čistá databáze měla sběr vypnutý, nula cílů a nula vzorků.
+
+Při ověření HTTPS se ukázal závod prvního startu: certifikát vznikl dříve,
+než NetworkManager přidělil Ethernetu IPv4, a neobsahoval IP SAN. Na testovacím
+zařízení byl obnoven za běhu a HTTPS pak s plným ověřením názvu/IP vrátilo
+úvodního průvodce. Zdrojový firstboot nově čeká na globální IPv4 rozhraní eth0
+před vystavením certifikátu; regresní test pokrývá pozdější přidělení adresy
+i timeout. Tato dodatečná oprava není obsažena v již vydaných immutable
+souborech r2. Před stabilním vydáním je nutný nový build a jeho přejímka.
+
 ## Dosud neprovedeno pro tento nový obraz
 
 Čerstvý zápis přes Raspberry Pi Imager, fyzický první boot, dokončení webového
