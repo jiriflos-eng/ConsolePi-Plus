@@ -119,6 +119,15 @@ python3 -c 'import ast, pathlib; ast.parse(pathlib.Path(
     "'"$ROOT"'/usr/local/sbin/consolepi-snmp-pass-persist").read_text())' &&
     ok "ConsolePi SNMP exporter Python syntax" || bad "ConsolePi SNMP exporter Python syntax"
 
+python3 "$ROOT/tests/ping_behavior.py" || bad "ping engine and peak preservation"
+python3 "$ROOT/tests/syslog_behavior.py" || bad "syslog forwarding behavior"
+if python3 -c 'import flask, cryptography' >/dev/null 2>&1; then
+    python3 "$ROOT/tests/ping_web_behavior.py" || bad "ping API security and administration"
+    python3 "$ROOT/tests/syslog_web_behavior.py" || bad "syslog web security and templates"
+else
+    printf '%s\n' 'SKIP: Flask/cryptography unavailable (syslog web tests)'
+fi
+
 python3 "$ROOT/tests/snmp_behavior.py" || bad "ConsolePi SNMP exporter behavior"
 python3 "$ROOT/tests/transcript_behavior.py" || bad "console transcript disconnect behavior"
 
@@ -216,6 +225,10 @@ grep -q '^Match User console LocalPort 2201$' "$ROOT/etc/ssh/sshd_config.d/40-co
     grep -q '/var/lib/snmp/snmpd.conf' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
     grep -q '/etc/apt/apt.conf.d/90consolepi-proxy' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
     grep -q '/var/backups/consolepi' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
+    grep -q 'systemctl stop consolepi-ping.service' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
+    grep -q 'clear_directory("/var/lib/consolepi-ping")' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
+    grep -q 'ssh nginx consolepi-web consolepi-port-monitor consolepi-ping consolepi-update-check.timer' "$ROOT/usr/local/sbin/consolepi-validate-generic-image" &&
+    grep -q 'check ping_data_empty' "$ROOT/usr/local/sbin/consolepi-validate-generic-image" &&
     grep -q 'systemd-analyze verify' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
     grep -q 'validate_generic_access' "$ROOT/usr/local/sbin/consolepi-generic-image-firstboot" &&
     ! grep -q '.consolepi-firstboot-token' "$ROOT/usr/local/sbin/consolepi-generic-image-firstboot" &&

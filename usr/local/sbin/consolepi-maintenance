@@ -44,6 +44,7 @@ BACKUP_FILES = {
     "etc/consolepi/ports.conf": (0o644, False),
     "etc/consolepi/serial.conf": (0o644, False),
     "etc/consolepi/consolepi.conf": (0o644, False),
+    "etc/consolepi/syslog.json": (0o600, False),
     "etc/consolepi/auth.conf": (0o644, False),
     "etc/consolepi/radius.json": (0o644, False),
     "etc/consolepi/radius-secrets.json": (0o600, True),
@@ -221,6 +222,7 @@ def backup_restore():
     raw = base64.b64decode(values.get("content", ""), validate=True)
     clear = decrypt_backup(raw, str(values.get("passphrase", "")))
     restored = []
+    syslog_values = None
     with tarfile.open(fileobj=io.BytesIO(clear), mode="r:gz") as archive:
         members = archive.getmembers()
         names = {member.name for member in members}
@@ -235,6 +237,11 @@ def backup_restore():
             ):
                 raise ValueError(f"Nepovolená položka v záloze: {member.name}")
             data = archive.extractfile(member).read()
+            if member.name == "etc/consolepi/syslog.json":
+                from consolepi_syslog import validate as validate_syslog
+                syslog_values = validate_syslog(json.loads(data))
+                restored.append(member.name)
+                continue
             mode, _ = BACKUP_FILES[member.name]
             atomic(Path("/") / member.name, data, mode)
             restored.append(member.name)
@@ -248,6 +255,11 @@ def backup_restore():
         os.chown(
             "/home/console/.ssh/authorized_keys", console.pw_uid, console.pw_gid
         )
+    if "etc/consolepi/syslog.json" in restored:
+        # Validate and apply through the same path as the web; never restore a queue.
+        sys.path.insert(0, "/usr/local/lib")
+        from consolepi_syslog import control as syslog_control
+        syslog_control("configure", syslog_values)
     run("systemctl", "reload", "ssh")
     run("systemctl", "restart", "consolepi-port-monitor", timeout=30)
     run("systemctl", "reload", "nginx", timeout=30)

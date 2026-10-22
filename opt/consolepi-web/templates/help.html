@@ -165,6 +165,15 @@
       </div>
     </section>
 
+    <section id="syslog" class="help-step">
+      <span class="step-number">S</span>
+      <div><h2>Vzdálený syslog</h2>
+        <p>V <strong>Systém → Logování → Vzdálený syslog</strong> nastavte server, port a práh severity 0–7. Zvolená úroveň zahrnuje všechny závažnější zprávy: Warning (4) odesílá 0–4, Informational (6) zahrnuje běžné relace.</p>
+        <p>Doporučený transport TCP/TLS ověřuje certifikát serveru a jeho jméno/IP. Pro interní PKI vložte veřejný PEM certifikát CA. Sériové přepisy se neodesílají.</p>
+        <p>Fronta je omezena na 2 000 zpráv; výpadek serveru neblokuje konzolové relace. Uložení změny nebo vypnutí frontu vyprázdní. Testovací zpráva používá zvolenou severity; její přijetí ověřte na serveru.</p>
+      </div>
+    </section>
+
     <section id="proxy" class="help-step">
       <span class="step-number">P</span>
       <div>

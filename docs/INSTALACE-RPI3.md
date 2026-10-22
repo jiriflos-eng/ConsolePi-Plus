@@ -1,4 +1,8 @@
-# ConsolePi+ 1.9.1: čistá instalace na Raspberry Pi 3
+# ConsolePi+ 2.0.0: čistá instalace na Raspberry Pi 3
+
+> Vydání 2.0.0 je předběžné: nový image čeká na fyzický první start a reboot.
+> Použijte pevný manifest 2.0.0; odkaz latest zatím vede na stabilní 1.9.1.
+> Ping Monitor: [instalace a přejímka](PING-MONITOR.md).
 
 Pro standardní zápis hotového ConsolePi+ použijte
 [návod pro generic image a manifest Imageru](INSTALACE-IMAGE-RPI-IMAGER.txt).
@@ -12,8 +16,8 @@ a webové heslo. Soukromý SSH klíč správce zůstává na jeho počítači.
 - Ethernet do management sítě s DHCP;
 - Raspberry Pi Imager, SSH klient a vlastní veřejný klíč Ed25519;
 - dostupné zdroje APT nebo odpovídající proxy pro bootstrap;
-- [instalační archiv 1.9.1](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz)
-  a jeho [SHA-256](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1-install.tar.gz.sha256).
+- [instalační archiv 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-install.tar.gz)
+  a jeho [SHA-256](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-install.tar.gz.sha256).
 
 ## 1. Příprava OS a SSH
 
@@ -49,8 +53,8 @@ Po restartu pokračujte. Bootstrap potřebuje aktuální systém a dostupné bal
 V adresáři se staženými soubory na macOS:
 
 ```sh
-shasum -a 256 -c ConsolePi-Plus-1.9.1-install.tar.gz.sha256
-scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-1.9.1-install.tar.gz consolepi@IP_ADRESA_PI:~/
+shasum -a 256 -c ConsolePi-Plus-2.0.0-install.tar.gz.sha256
+scp -i "$HOME/.ssh/consolepi-admin" ConsolePi-Plus-2.0.0-install.tar.gz consolepi@IP_ADRESA_PI:~/
 ssh -i "$HOME/.ssh/consolepi-admin" consolepi@IP_ADRESA_PI
 ```
 
@@ -60,7 +64,7 @@ a hodnotu porovnat s checksumem. Na RPi rozbalte archiv bez přebírání vlastn
 ```sh
 install_dir="$HOME/consolepi-install"
 mkdir -p "$install_dir"
-tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.1-install.tar.gz" -C "$install_dir"
+tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-2.0.0-install.tar.gz" -C "$install_dir"
 cd "$install_dir"
 ./bootstrap-install.sh
 ```
@@ -71,7 +75,7 @@ zdroj. Jinou management síť lze určit pomocí
 `./bootstrap-install.sh --management-cidr 10.176.122.0/24`.
 
 Při vlastním sestavení ze zdrojů použijte `./tools/build-install-bundle.sh`;
-výstup pro VERSION 1.9.1 je `dist/ConsolePi-Plus-1.9.1-install.tar.gz`.
+výstup pro aktuální VERSION 2.0.0 je `dist/ConsolePi-Plus-2.0.0-install.tar.gz`.
 
 ## 4. Dokončení ve webovém průvodci
 
@@ -102,7 +106,7 @@ Přiřazenou sériovou konzoli otevřete pomocí
 - **Systém → Údržba**: samostatné systémové aktualizace a podpisem ověřované
   aplikační balíčky `.cpiupdate`. Aplikace odmítá stejnou nebo nižší verzi.
 - **Systém → Logování konzolových portů**: ponechte **Pouze události**, pokud
-  se nesmí ukládat obsah terminálu. Režimy output/full v 1.9.1 zaznamenávají
+  se nesmí ukládat obsah terminálu. Režimy output/full v 2.0.0 zaznamenávají
   výstup přes picocom bez obsahové redakce; zařízení může vypsat tajemství.
 - **Síť → SNMPv3**: volitelné `authPriv`, dostupné pouze z management allowlistu;
   viz [Zabbix](../zabbix/README.md).

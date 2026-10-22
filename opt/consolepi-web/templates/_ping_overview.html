@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='ping-overview.css') }}">
+<section class="ping-overview" data-ping-overview hidden>
+  <div class="pm-heading"><h2><span class="heading-illustration ping" aria-hidden="true"></span>Ping Monitor</h2><span class="pm-live" data-pm-health></span></div>
+  <div class="pm-tiles" data-pm-tiles></div>
+  <div class="pm-ranking-heading"><div><h3>TOP přehled</h3><p>Skutečná maxima odezvy a výpadky za zvolené období.</p></div><label>Období <select data-pm-period><option value="3600">60 minut</option><option value="172800">48 hodin</option><option value="2592000">30 dní</option><option value="31536000">1 rok</option></select></label></div>
+  <div class="pm-rankings" data-pm-rankings></div>
+  <p class="pm-update" data-pm-updated role="status"></p>
+</section>
+<script defer src="{{ url_for('static', filename='ping-overview.js') }}"></script>

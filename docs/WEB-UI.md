@@ -45,6 +45,17 @@ Events-only mode is active; see the security documentation for implementation li
 
 ![Rozsah záznamu a limity](screenshots/1.9.1/09-logovani.jpg)
 
+## Vzdálený syslog / Remote syslog
+
+Lokální náhled zdrojového rozšíření 1.9.1 z 8. 10. 2026. Panel umožňuje vybrat
+server, ověřovaný TCP/TLS, severity a veřejný certifikát vlastní CA. Ukazuje také
+čekající a zahozené zprávy. S17 není snímek nasazené funkce na RPi; původní image
+z 2. 10. 2026 syslog neobsahuje. Viz [specifikace](SYSLOG.md) a
+[akceptační testy 11–22](security/README.md#vzdálený-syslog-ve-zdrojovém-rozšíření-191).
+Local preview of the source extension; target-device acceptance remains pending.
+
+![Lokální náhled nastavení vzdáleného syslogu S17](screenshots/1.9.1/17-syslog-preview.png)
+
 ## Ověření aplikační aktualizace / Application update verification
 
 Formulář přijímá podepsaný balíček .cpiupdate. Nenahrazuje systémové aktualizace

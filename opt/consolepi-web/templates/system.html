@@ -4,6 +4,14 @@
 {% set active_page = "system" %}
 {% include "_navigation.html" %}
 <style>
+  .syslog-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  .syslog-form label { display:grid; gap:6px; }
+  .syslog-form label.syslog-toggle { display:flex; align-items:center; gap:10px; }
+  .syslog-toggle input { width:auto; margin:0; }
+  .syslog-form .full { grid-column:1 / -1; }
+  .syslog-form select,.syslog-form textarea { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); font:inherit; }
+  .syslog-form button { justify-self:start; }
+  @media(max-width:560px) { .syslog-form { grid-template-columns:1fr; } }
   .system-details { grid-template-columns:minmax(0,1.12fr) minmax(520px,.88fr); }
   .system-card .service-list > div { grid-template-columns:12px minmax(220px,1fr) 40px 94px; gap:12px; }
   .service-list strong { white-space:nowrap; }
@@ -312,6 +320,41 @@
 </div>
 
 <div class="system-section" data-system-section="logs" {% if system_section != "logs" %}hidden{% endif %}>
+<section class="system-card">
+  <h2>Vzdálený syslog</h2>
+  <p>Odesílá vybrané bezpečnostní události. Obsah sériových konzolí se neodesílá.
+    Zvolená severity zahrnuje i všechny závažnější úrovně; například Warning (4) odesílá 0–4.</p>
+  <form action="{{ url_for('system_syslog') }}" method="post" class="syslog-form">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="configure">
+    <label class="full syslog-toggle"><input type="checkbox" name="enabled" {% if syslog.enabled %}checked{% endif %}> Zapnout odesílání</label>
+    <label>Server<input name="host" value="{{ syslog.host }}" maxlength="253" placeholder="syslog.example.cz nebo IP adresa"></label>
+    <label>Port<input type="number" name="port" min="1" max="65535" value="{{ syslog.port }}" required></label>
+    <label>Transport<select name="transport">
+      <option value="tls" {% if syslog.transport == 'tls' %}selected{% endif %}>TCP/TLS – ověřovaný certifikát serveru</option>
+      <option value="tcp" {% if syslog.transport == 'tcp' %}selected{% endif %}>TCP – nešifrované, pouze v důvěryhodné síti</option>
+    </select></label>
+    <label>Odesílat úroveň a závažnější<select name="severity">
+      {% for level in syslog.levels %}<option value="{{ loop.index0 }}" {% if syslog.severity == loop.index0 %}selected{% endif %}>{{ level }} ({{ loop.index0 }})</option>{% endfor %}
+    </select></label>
+    <label class="full">Vlastní CA certifikát (PEM, volitelné)<textarea name="ca_pem" rows="4" maxlength="65536" spellcheck="false">{{ syslog.ca_pem }}</textarea></label>
+    <p class="full">Prázdné pole používá systémové důvěryhodné CA. Certifikát serveru musí odpovídat jménu nebo IP adrese. Vložte veřejný certifikát CA, nikdy privátní klíč.</p>
+    <p class="full">Uložení změny nebo vypnutí vyprázdní dosavadní frontu, aby se staré události neposlaly na jiný server.</p>
+    <button type="submit">Uložit syslog</button>
+  </form>
+  <div class="logging-stats">
+    <span><small>Odesílání</small><strong>{{ 'Vypnuto' if not syslog.enabled else ('Opakování po chybě' if syslog.state == 'retrying' else ('Služba běží' if syslog.running else 'Služba neběží')) }}</strong></span>
+    <span><small>Ve frontě</small><strong>{{ syslog.pending if syslog.pending is not none else '—' }} / 2000</strong></span>
+    <span><small>Zahozeno při zaplnění</small><strong>{{ syslog.dropped if syslog.dropped is not none else '—' }}</strong></span>
+  </div>
+  <p>Poslední předání do spojení: {{ syslog.last_sent or 'Zatím žádné' }}. Tento stav není potvrzením uložení na serveru.</p>
+  {% if syslog.error %}<p class="security-note">{{ syslog.error }}</p>{% endif %}
+  <form action="{{ url_for('system_syslog') }}" method="post">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="test">
+    <button type="submit" {% if not syslog.enabled %}disabled{% endif %}>Odeslat testovací zprávu</button>
+  </form>
+</section>
+
 <section class="system-card logging-card">
   <div class="logging-heading">
     <div>

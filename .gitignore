@@ -9,3 +9,7 @@ authorized_keys
 dist-public/
 public-release/
 __pycache__/
+
+# Local QA, device snapshots, deployment bundles and virtual environments.
+outputs/
+dist/

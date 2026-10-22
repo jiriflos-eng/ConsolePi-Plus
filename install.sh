@@ -104,7 +104,7 @@ fi
 export DEBIAN_FRONTEND=noninteractive
 if [ "$UPDATE_MODE" != yes ]; then
     apt-get update
-    apt-get install -y openssh-server picocom util-linux nftables logrotate udev \
+    apt-get install -y fping openssh-server picocom util-linux nftables logrotate udev \
         python3-flask python3-cryptography python3-bcrypt gunicorn nginx openssl \
         libpam-radius-auth gcc libpam0g-dev chrony cloud-guest-utils lldpd snmpd avahi-daemon
 fi
@@ -169,6 +169,8 @@ for target in \
     /usr/local/sbin/consolepi-validate-generic-image \
     /usr/local/lib/consolepi_firstboot_security.py \
     /usr/local/lib/consolepi_boot_network.py \
+    /usr/local/lib/consolepi_syslog.py \
+    /etc/systemd/system/consolepi-syslog.service \
     /usr/share/consolepi/consolepi-network.txt \
     /etc/systemd/system/consolepi-boot-network.service \
     /usr/local/lib/consolepi_imager_security.py \
@@ -184,6 +186,7 @@ for target in \
     /etc/logrotate.d/consolepi \
     /etc/NetworkManager/dispatcher.d/90-consolepi-firewall \
     /etc/avahi/services/consolepi.service \
+    /etc/systemd/system/consolepi-ping.service \
     /etc/systemd/system/consolepi-web.service \
     /etc/systemd/system/consolepi-port-monitor.service \
     /etc/systemd/system/consolepi-update-check.service \
@@ -282,6 +285,14 @@ install -m 0755 "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" /usr/loca
 install -m 0755 "$ROOT/usr/local/sbin/consolepi-validate-generic-image" /usr/local/sbin/consolepi-validate-generic-image
 install -m 0644 "$ROOT/usr/local/lib/consolepi_firstboot_security.py" /usr/local/lib/consolepi_firstboot_security.py
 install -m 0644 "$ROOT/usr/local/lib/consolepi_boot_network.py" /usr/local/lib/consolepi_boot_network.py
+install -m 0644 "$ROOT/usr/local/lib/consolepi_syslog.py" /usr/local/lib/consolepi_syslog.py
+install -m 0644 "$ROOT/etc/systemd/system/consolepi-syslog.service" /etc/systemd/system/consolepi-syslog.service
+install -d -m 0700 /var/lib/consolepi-syslog
+if [ ! -e /etc/consolepi/syslog.json ]; then
+    printf '%s\n' '{"enabled":false,"host":"","port":6514,"transport":"tls","severity":6,"ca_pem":""}' >/etc/consolepi/syslog.json
+    chmod 0600 /etc/consolepi/syslog.json
+fi
+
 install -m 0644 "$ROOT/usr/share/consolepi/consolepi-network.txt" /usr/share/consolepi/consolepi-network.txt
 install -m 0644 "$ROOT/etc/systemd/system/consolepi-boot-network.service" /etc/systemd/system/consolepi-boot-network.service
 install -m 0644 "$ROOT/usr/local/lib/consolepi_imager_security.py" /usr/local/lib/consolepi_imager_security.py
@@ -304,6 +315,7 @@ install -m 0755 "$ROOT/etc/NetworkManager/dispatcher.d/90-consolepi-firewall" \
     /etc/NetworkManager/dispatcher.d/90-consolepi-firewall
 install -m 0644 "$ROOT/etc/avahi/services/consolepi.service" /etc/avahi/services/consolepi.service
 install -m 0644 "$ROOT/etc/systemd/system/consolepi-web.service" /etc/systemd/system/consolepi-web.service
+install -m 0644 "$ROOT/etc/systemd/system/consolepi-ping.service" /etc/systemd/system/consolepi-ping.service
 install -m 0644 "$ROOT/etc/systemd/system/consolepi-port-monitor.service" /etc/systemd/system/consolepi-port-monitor.service
 install -m 0644 "$ROOT/etc/systemd/system/consolepi-update-check.service" /etc/systemd/system/consolepi-update-check.service
 install -m 0644 "$ROOT/etc/systemd/system/consolepi-update-check.timer" /etc/systemd/system/consolepi-update-check.timer
@@ -369,6 +381,7 @@ if ! id consolepi-web >/dev/null 2>&1; then
         --shell /usr/sbin/nologin consolepi-web
 fi
 install -d -o consolepi-web -g consolepi-web -m 0700 /var/lib/consolepi-web/release-uploads
+install -d -o consolepi-web -g consolepi-web -m 0700 /var/lib/consolepi-ping
 
 # A card-specific marker distinguishes the source card from a cloned image.
 if [ "$FIRSTBOOT_PENDING" = yes ]; then
@@ -404,6 +417,7 @@ cp -a "$ROOT/opt/consolepi-web/." /opt/consolepi-web/
 chown -R root:root /opt/consolepi-web
 find /opt/consolepi-web -type d -exec chmod 0755 {} \;
 find /opt/consolepi-web -type f -exec chmod 0644 {} \;
+runuser -u consolepi-web -- /usr/bin/python3 -c "import sys; sys.path.insert(0, '/opt/consolepi-web'); import ping_monitor; ping_monitor.migrate()"
 
 if [ ! -s /etc/consolepi/web.secret ]; then
     python3 -c 'import secrets; print(secrets.token_hex(32))' >/etc/consolepi/web.secret
@@ -502,6 +516,16 @@ fi
 systemctl enable ssh
 systemctl reload ssh
 systemctl daemon-reload
+# Preserve forwarding on updates; disabled by default on clean installation.
+python3 - <<'SYSLOGPY'
+import json, subprocess
+from pathlib import Path
+p = Path('/etc/consolepi/syslog.json')
+if p.exists() and json.loads(p.read_text()).get('enabled'):
+    subprocess.run(['systemctl', 'enable', '--now', 'consolepi-syslog'], check=True)
+    subprocess.run(['systemctl', 'restart', 'consolepi-syslog'], check=True)
+SYSLOGPY
+systemctl enable consolepi-ping
 systemctl enable nginx consolepi-web consolepi-port-monitor
 if [ "$AVAHI_AVAILABLE" = yes ]; then
     systemctl enable avahi-daemon
@@ -513,6 +537,7 @@ if [ "$UPDATE_MODE" = yes ]; then
     # se proto při aktualizaci aktivují až následným rebootem release runneru.
     printf '%s\n' 'Aktualizace: restart služeb je odložen až na řízený reboot ConsolePi.'
 else
+    systemctl restart consolepi-ping
     systemctl restart nginx consolepi-web consolepi-port-monitor
     if [ "$AVAHI_AVAILABLE" = yes ]; then
         systemctl restart avahi-daemon

@@ -1,4 +1,11 @@
-# ConsolePi+ 1.9.1 – instalace na nový Raspberry Pi 3
+# ConsolePi+ 2.0.0 – správa a instalace na Raspberry Pi 3
+
+Zdrojový kód je ve verzi **2.0.0** s novým [Ping Monitorem](docs/PING-MONITOR.md).
+[Předběžné vydání 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r2)
+obsahuje sanitizovaný image, Imager manifest, instalační a zdrojový archiv a
+SHA-256. Nový image ještě vyžaduje první start a reboot z čerstvě zapsané SD;
+stabilní `latest` zatím zůstává 1.9.1. Podepsaný aktualizační balíček 2.0.0 není
+součástí vydání. Historické snímky níže zachycují rozhraní 1.9.1.
 
 ![ConsolePi+ 1.9.1 – administrační přehled](docs/screenshots/1.9.1/01-prehled.jpg)
 
@@ -6,15 +13,15 @@ Aktuální [obrazový přehled rozhraní](docs/WEB-UI.md) a
 [bezpečnostní podklady pro audit](docs/security/README.md) obsahují snímky
 z testovacího RPi z 6. 10. 2026. Zobrazené adresy jsou příklady.
 
-## Hotový image 1.9.1 v Raspberry Pi Imageru
+## Image 2.0.0 k ověření v Raspberry Pi Imageru
 
-Stáhněte a otevřete [manifest verze 1.9.1](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v1.9.1/ConsolePi-Plus-1.9.1.rpi-imager-manifest),
+Stáhněte a otevřete [manifest verze 2.0.0](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest),
 nebo jeho URL vložte do **Nastavení → Content Repository → Edit** a potvrďte
 **Apply & Restart**. URL sledující nejnovější vydání:
 
     https://github.com/jiriflos-eng/ConsolePi-Plus/releases/latest/download/ConsolePi-Plus.rpi-imager-manifest
 
-Vyberte Raspberry Pi 3 a ConsolePi+ 1.9.1. Nastavte pouze SSH s jedním veřejným
+Vyberte Raspberry Pi 3 a ConsolePi+ 2.0.0. Nastavte pouze SSH s jedním veřejným
 klíčem Ed25519; ostatní přizpůsobení vypněte. Přímé „Use custom“ pro generic
 image nezpřístupňuje požadovanou OS customizaci. Pro statickou IPv4 po ověření
 zápisu upravte `consolepi-network.txt` na boot oddílu před prvním startem.
@@ -22,7 +29,7 @@ zápisu upravte `consolepi-network.txt` na boot oddílu před prvním startem.
 
 ## Ruční instalace na čistý Raspberry Pi OS Lite
 
-Tento postup používá hotový archiv `ConsolePi-Plus-1.9.1-install.tar.gz`. Nevyžaduje bitovou kopii SD karty a je určen pro čistý Raspberry Pi OS Lite s DHCP.
+Tento postup používá hotový archiv `ConsolePi-Plus-2.0.0-install.tar.gz`. Nevyžaduje bitovou kopii SD karty a je určen pro čistý Raspberry Pi OS Lite s DHCP.
 
 ## 1. Vytvoření SSH klíče
 
@@ -105,15 +112,15 @@ Po restartu se znovu přihlaste stejným příkazem.
 
 Z Macu odešlete hotový archiv přímo do domovského adresáře uživatele `consolepi`. Místo `IP_RPI` doplňte DHCP adresu zařízení:
 
-    scp -i "$HOME/.ssh/consolepi-admin" "ConsolePi-Plus-1.9.1-install.tar.gz" consolepi@IP_RPI:~/
+    scp -i "$HOME/.ssh/consolepi-admin" "ConsolePi-Plus-2.0.0-install.tar.gz" consolepi@IP_RPI:~/
 
 Pokud soubor nemáte v aktuálním adresáři, použijte jeho úplnou cestu, například:
 
-    scp -i "$HOME/.ssh/consolepi-admin" "$HOME/Downloads/ConsolePi-Plus-1.9.1-install.tar.gz" consolepi@IP_RPI:~/
+    scp -i "$HOME/.ssh/consolepi-admin" "$HOME/Downloads/ConsolePi-Plus-2.0.0-install.tar.gz" consolepi@IP_RPI:~/
 
 Ve Windows použijte v PowerShellu odpovídající cestu k soukromému klíči:
 
-    scp -i "$env:USERPROFILE\.ssh\consolepi-admin" "$HOME\Downloads\ConsolePi-Plus-1.9.1-install.tar.gz" consolepi@IP_RPI:~/
+    scp -i "$env:USERPROFILE\.ssh\consolepi-admin" "$HOME\Downloads\ConsolePi-Plus-2.0.0-install.tar.gz" consolepi@IP_RPI:~/
 
 ## 5. Instalace na Raspberry Pi
 
@@ -125,7 +132,7 @@ Na Raspberry Pi spusťte následující příkazy. Archiv se rozbalí do vašeho
 
     install_dir="$HOME/consolepi-install"
     mkdir -p "$install_dir"
-    tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-1.9.1-install.tar.gz" -C "$install_dir"
+    tar --no-same-owner -xzf "$HOME/ConsolePi-Plus-2.0.0-install.tar.gz" -C "$install_dir"
     cd "$install_dir"
     ./bootstrap-install.sh
 
@@ -225,3 +232,35 @@ Aktivní cesta relace nevolá redakční writer; na popisky „aktivní redakce�
 „obousměrný přepis“ proto nespoléhejte jako na záruku. Pokud se nesmí ukládat
 obsah terminálu, ponechte Pouze události. Podrobnosti a dosud nevyhodnocené
 testy jsou v [bezpečnostních podkladech](docs/security/README.md).
+
+## Vzdálený syslog
+
+Verze 2.0.0 obsahuje **Systém → Logování → Vzdálený syslog**: práh severity 0–7
+jako u síťových prvků, TCP/TLS s ověřením certifikátu, omezenou trvalou frontu
+a testovací zprávu. Výchozí stav je vypnuto; sériové přepisy se neodesílají.
+[Nastavení, omezení doručení a stav distribuce](docs/SYSLOG.md).
+
+## Ping Monitor
+
+[Kontrola image a zbývající přejímka](docs/RELEASE-2.0.0.md).
+
+V administraci zapněte **Ping Monitor**, otevřete `/ping` a přidejte název
+zařízení a IP adresu nebo hostname. Doporučený začátek: interval 30 s, jedna
+sonda, timeout 1 s. Čistý image má sběr vypnutý, bez zařízení a historie.
+
+Na úvodním dashboardu se objeví zelené dlaždice s minigrafy a TOP tabulky
+nejvyšších RTT, počtu výpadků a ztrát. Kliknutí otevře grafy odezvy, packet loss
+a jitteru s gradientní výplní, rozsahy 60 minut / 48 hodin / 30 dní / 1 rok
+a přiblížením. Redukce bodů zachovává skutečné extrémy a jejich čas.
+Světle žlutá plocha označuje evidované vypnutí či pozastavení sběru, světle
+červená potvrzený výpadek. Při nulových ztrátách křivka leží na ose.
+
+Administrace obsahuje nastavení s nápovědou u polí, údržbu, pozastavení a CSV
+import/export. Přehled a grafy zapnutého modulu jsou dostupné bez přihlášení;
+adresy a konfigurace jsou chráněné. [Podrobný návod, statistiky, API a retence](docs/PING-MONITOR.md).
+
+### Lokální sestavení instalátoru 2.0.0
+
+Z ověřeného zdrojového checkoutu spusťte `./tools/build-install-bundle.sh`.
+Vznikne `dist/ConsolePi-Plus-2.0.0-install.tar.gz` a SHA-256 soubor. Jde o lokální
+instalační archiv, nikoliv o zveřejněný image nebo podepsanou aktualizaci.

@@ -1891,6 +1891,9 @@ def factory_reset():
         # soubory jsou generované z této bezpečné výchozí konfigurace;
         # volání nevyžaduje dostupnou síť.
         apt_sources_reset()
+        sys.path.insert(0, "/usr/local/lib")
+        from consolepi_syslog import control as syslog_control
+        syslog_control("reset")
         atomic_write(LABELS_CONFIG, "{}\n", 0o644)
         # Vlastní povolené zdroje jsou provozní nastavení firewallu. Tovární
         # reset je smaže; aktuální lokální ethernetová síť se doplní níže
@@ -2124,6 +2127,11 @@ def main():
         if sys.argv[2] != "reset":
             raise ValueError("Nepovolená tovární operace.")
         factory_reset()
+    elif len(sys.argv) == 3 and sys.argv[1] == "syslog":
+        sys.path.insert(0, "/usr/local/lib")
+        from consolepi_syslog import control
+        values = json.load(sys.stdin) if sys.argv[2] == "configure" else None
+        print(json.dumps(control(sys.argv[2], values)))
     elif len(sys.argv) >= 3 and sys.argv[1] == "logs":
         action = sys.argv[2]
         if action == "status" and len(sys.argv) == 3:

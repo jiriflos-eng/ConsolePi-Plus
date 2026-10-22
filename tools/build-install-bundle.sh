@@ -34,6 +34,7 @@ tar --no-xattrs -C "$ROOT" \
     --exclude='./releases' \
     --exclude='./dist' \
     --exclude='./downloads' \
+    --exclude='./outputs' \
     --exclude='./dist-public' \
     --exclude='./public-release' \
     --exclude='./__pycache__' \

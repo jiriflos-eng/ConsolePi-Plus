@@ -1,7 +1,9 @@
 # ConsolePi+ public release checklist
 
 The public repository is [jiriflos-eng/ConsolePi-Plus](https://github.com/jiriflos-eng/ConsolePi-Plus),
-licensed under [MIT](LICENSE). The current release is **1.9.1**. Use this
+licensed under [MIT](LICENSE). The current source version is **2.0.0**; the
+stable image/archive release remains **1.9.1**. The **2.0.0 prerelease** provides
+a sanitized image and matching artifacts for a fresh physical boot test. Use this
 checklist for subsequent publication; repository creation and license selection
 have already been completed.
 
@@ -17,12 +19,12 @@ local untracked output must not enter a release archive.
 ## Release artifacts
 
 Use title **ConsolePi+ vX.Y.Z** and prefix `ConsolePi-Plus-X.Y.Z-*`.
-For 1.9.1 the release contains:
+For 2.0.0 the prerelease contains:
 
-- `ConsolePi-Plus-1.9.1-generic.img.xz`;
-- `ConsolePi-Plus-1.9.1-install.tar.gz` and `ConsolePi-Plus-1.9.1-source.tar.gz`;
+- `ConsolePi-Plus-2.0.0-r2-generic.img.xz`;
+- `ConsolePi-Plus-2.0.0-install.tar.gz` and `ConsolePi-Plus-2.0.0-source.tar.gz`;
 - per-archive SHA-256 files and `SHA256SUMS`;
-- `ConsolePi-Plus-1.9.1.rpi-imager-manifest` and the stable-name alias
+- `ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest` and the stable-name alias
   `ConsolePi-Plus.rpi-imager-manifest`;
 - Imager icons and the image installation guide.
 
@@ -36,11 +38,20 @@ Generic images must be sanitized and validated before publication. Remove
 administrator keys, device identity, web password, TLS private key, configured
 networks, proxy/mirror settings, secrets and logs. Verify fresh first boot and
 reboot with key-only SSH, the web wizard, and DHCP/static boot provisioning.
-Publish only the sanitized image and its checksums.
+Publish only the sanitized image and its checksums. A prerelease must clearly
+identify pending physical first-boot/reboot checks; promote it to stable only
+after those checks pass. The latest-release manifest continues to resolve to
+the previous stable release until promotion.
+
+Ping sanitization stops `consolepi-ping.service`, empties its whole StateDirectory
+(including SQLite/WAL/SHM, device targets and pause history), and verifies that
+no data remains. Free ext4 blocks and the journal must also be scrubbed before
+compression; logical file deletion alone is insufficient.
 
 Signed `.cpiupdate` application packages are a separate distribution mechanism.
 Do not imply that such a package exists for a release without publishing it;
-1.9.1 assets currently include the image, source and installer listed above.
+2.0.0 prerelease assets include the image, source and installer listed above.
+See [build validation and pending checks](docs/RELEASE-2.0.0.md).
 Keep previously published release assets and tags immutable when only updating
 repository documentation.
 

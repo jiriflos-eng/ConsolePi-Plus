@@ -1,3 +1,52 @@
+## Oprava firstboot HTTPS · 22. října 2026 (zdroje)
+
+- Před vystavením certifikátu se čeká na IPv4 rozhraní eth0; IP SAN už
+  nezávisí na tom, zda NetworkManager stihl přidělit adresu před startem služby.
+- Regresní test ověřuje opožděné přidělení adresy i ukončení při timeoutu.
+- Na fyzicky spuštěném r2 bylo ověřeno SSH, aktivní služby a čistá Ping DB;
+  po obnovení certifikátu také HTTPS průvodce. Po jeho dokončení prošel reboot,
+  zachování konfigurace/historie a pokračování sond (UP). Vydané soubory r2
+  se nemění; nový build s TLS opravou ještě čeká na přejímku.
+
+## Oprava image 2.0.0-r2 · 22. října 2026
+
+- Aplikace zůstává 2.0.0. První předběžný image měl kvůli chybě sestavení
+  zakázané služby SSH a webu a je označen jako vadný.
+- Revize r2 opravuje start služeb bez změny klíčové autentizace či firstboot gate.
+- Generic validátor nyní vyžaduje povolení každé SSH/web/monitorovací služby
+  zvlášť; původní vadný obraz tímto testem neprojde.
+- Použijte pevný manifest `ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest` z
+  vydání `v2.0.0-r2`. Obraz ještě čeká na nový fyzický první start a reboot.
+
+# ConsolePi+ 2.0.0 · Ping Monitor
+
+- Kontinuální ICMP monitoring v samostatné službě `consolepi-ping.service`,
+  SQLite/WAL, verzované schéma, agregace a retenční úklid.
+- Úvodní dashboard zobrazuje při zapnutém modulu zelené dlaždice s historií
+  a TOP přehledy nejvyšších RTT, počtu incidentů a packet loss.
+- Detail zařízení nabízí grafy latence, ztrát a jitteru, časové rozsahy,
+  přiblížení a historii incidentů. Min/Max downsampling uchovává skutečné
+  extrémy včetně původních časů i po odstranění raw vzorků.
+- Administrace obsahuje pouze správu zařízení: přehledný formulář, kontextovou
+  nápovědu u všech 17 polí, CSV import/export, pauzu a plánovanou údržbu.
+- Přepínač monitoru v administraci; stávající autentizace a CSRF pro změny.
+  Read-only přehled a detail jsou při zapnutém modulu dostupné také před
+  přihlášením; konfigurační údaje a adresy zařízení veřejné API nevrací.
+- Instalátor zahrnuje službu, migraci a fping; starší offline instalace mohou
+  použít iputils-ping. Neotevírá se nový port a nemění se SSH ani firewall.
+- Součástí zdrojů je i dřívější rozšíření vzdáleného syslogu popsané níže.
+- Ověřeno na RPi3: automatické testy, IPv4/IPv6, DNS chyba, nedostupný cíl,
+  více sond, přepínač, restart sběrače a krátká zátěž 32 konfigurací.
+  Podrobnosti a omezení: [Ping Monitor](docs/PING-MONITOR.md).
+- Předběžné vydání 2.0.0 obsahuje sanitizovaný image, Imager manifest,
+  instalátor, zdrojový archiv a SHA-256. Čistý obraz nemá zařízení, historii,
+  přihlašovací údaje ani klíče konkrétního RPi; Ping Monitor je vypnutý.
+- Grafy jitteru a packet loss mají gradient v barvě křivky. Evidované vypnutí
+  sběru je světle žluté, potvrzený výpadek světle červený.
+- Nový image čeká na fyzický první start a reboot z nově zapsané SD.
+  Dlouhodobý test a fyzická sériová konzole zůstávají k ověření.
+  Podepsaný aktualizační balíček 2.0.0 se nevydává; stabilní latest zůstává 1.9.1.
+
 # ConsolePi+ 1.9.1 · Offline Ethernet IPv4 provisioning
 
 - Generic images include `consolepi-network.txt` on the visible boot partition.
@@ -11,6 +60,17 @@
 - Stop systemd-random-seed before sanitizing its seed and remove legacy claim tokens.
 - Include a Raspberry Pi Imager manifest with image sizes, SHA-256 hashes and SSH customization metadata.
 - Verified clean first boot and reboot on Raspberry Pi 3 with static IPv4, key-only SSH and HTTPS.
+
+## Syslog extension · 8 October 2026 (source revision)
+
+- Optional remote syslog with severity 0–7 and inclusive filtering (for example,
+  warning includes levels 0–4), TCP/TLS certificate verification and test messages.
+- Selected journal events only; serial transcripts are never read or forwarded.
+- Persistent bounded queue, retry state and queue-pressure/drop counters.
+- Fixed-field web login audit events and warning severity for denied sessions.
+- Backup configuration integration and sanitization/reset of destination, CA and queue.
+- The original 2 October image/archives do not contain this extension. Updated
+  distribution requires target-device validation; see [syslog distribution status](docs/SYSLOG.md#distribuce).
 
 ## Documentation refresh · 6 October 2026
 

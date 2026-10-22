@@ -774,11 +774,56 @@ def test_imager_key_and_firstrun(root):
     expect_failure(imager_security.provision_host_keys, generated, os.getuid(), os.getgid(), fail_sshd)
 
 
+def test_ping_state_cleanup(root):
+    state = root / "consolepi-ping"; state.mkdir(mode=0o700)
+    for name in ("monitor.sqlite3", "monitor.sqlite3-wal", "monitor.sqlite3-shm", "collector.lock"):
+        (state / name).write_bytes(b"private device data")
+    outside = root / "outside"; outside.mkdir()
+    (outside / "keep").write_text("unrelated data")
+    (state / "link").symlink_to(outside, target_is_directory=True)
+    imager_security.clear_directory(state)
+    assert not any(state.iterdir())
+    assert (outside / "keep").read_text() == "unrelated data"
+    unsafe = root / "unsafe-state"; unsafe.symlink_to(outside, target_is_directory=True)
+    expect_failure(imager_security.clear_directory, unsafe)
+
+
+def test_tls_waits_for_ethernet(root):
+    source = (ROOT / "usr/local/sbin/consolepi-generic-image-firstboot").read_text()
+    function = re.search(r"wait_for_ethernet_ipv4\(\)\n\{.*?\n\}", source, re.S).group()
+    assert 'tls_ip=$(wait_for_ethernet_ipv4)' in source
+    assert source.index('tls_ip=$(wait_for_ethernet_ipv4)') < source.index('openssl req')
+    binary = root / "tls-bin"; binary.mkdir()
+    counter = root / "ip-counter"
+    (binary / "ip").write_text("""#!/bin/sh
+n=0
+[ ! -f "$IP_TEST_COUNTER" ] || n=$(cat "$IP_TEST_COUNTER")
+n=$((n+1)); printf '%s' "$n" > "$IP_TEST_COUNTER"
+[ "$IP_TEST_MODE" != unavailable ] || exit 0
+[ "$n" -gt 2 ] || exit 0
+printf '2: eth0 inet 192.0.2.5/24 brd 192.0.2.255 scope global eth0\n'
+""")
+    (binary / "sleep").write_text("#!/bin/sh\nexit 0\n")
+    for command in binary.iterdir(): command.chmod(0o755)
+    env = dict(os.environ, PATH=str(binary)+os.pathsep+os.environ['PATH'],
+               IP_TEST_COUNTER=str(counter), IP_TEST_MODE='delayed')
+    result = subprocess.run(['sh','-c',function+'\nwait_for_ethernet_ipv4'],
+                            env=env, capture_output=True, text=True)
+    assert result.returncode == 0 and result.stdout == '192.0.2.5\n', result
+    assert counter.read_text() == '3'
+    env['IP_TEST_MODE'] = 'unavailable'
+    result = subprocess.run(['sh','-c',function+'\nwait_for_ethernet_ipv4'],
+                            env=env, capture_output=True, text=True)
+    assert result.returncode != 0 and not result.stdout
+
+
 def main():
     os.umask(0o022)
     with tempfile.TemporaryDirectory() as directory:
         root = pathlib.Path(directory)
         state_root = root / "states"; state_root.mkdir(); test_states(state_root)
+        test_ping_state_cleanup(root)
+        test_tls_waits_for_ethernet(root)
         test_management_networks()
         firewall_root = root / "bootstrap-firewall"; firewall_root.mkdir(); test_generic_bootstrap_firewall(firewall_root)
         update_root = root / "update"; update_root.mkdir(); test_generic_update_and_validation_report(update_root)
