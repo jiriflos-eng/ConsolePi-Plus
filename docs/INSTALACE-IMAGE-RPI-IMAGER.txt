@@ -18,7 +18,7 @@ CO JE POTŘEBA
 - napájení Raspberry Pi
 - ethernetový kabel; DHCP server nebo známá volná statická IPv4 adresa
 - počítač s Raspberry Pi Imagerem a SSH klientem
-- soubor ConsolePi-Plus-2.0.0-generic.img.xz nebo manifest tohoto vydání
+- soubor ConsolePi-Plus-2.0.0-r2-generic.img.xz nebo manifest tohoto vydání
 - vlastní Ed25519 veřejný SSH klíč správce (soubor s příponou .pub)
 
 KROK 1 – ZÁPIS IMAGE
@@ -27,7 +27,7 @@ KROK 1 – ZÁPIS IMAGE
 2. Otevřete Raspberry Pi Imager.
 3. Klikněte na „Choose Device“ a vyberte Raspberry Pi 3.
    Pro verzi 2.0.0 lze stáhnout a dvojklikem otevřít manifest:
-   https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0/ConsolePi-Plus-2.0.0.rpi-imager-manifest
+   https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r2/ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest
    Stejnou URL lze zadat v Nastavení → Content Repository → Edit
    jako vlastní repozitář a potvrdit „Apply & Restart“.
    URL sledující nejnovější vydání:
@@ -61,7 +61,7 @@ KROK 1 – ZÁPIS IMAGE
 
 KROK 1A – STATICKÁ IPv4 BEZ DHCP
 ---------------------------------
-Vydaný image ConsolePi-Plus-2.0.0-generic.img.xz tuto podporu obsahuje.
+Vydaný image ConsolePi-Plus-2.0.0-r2-generic.img.xz tuto podporu obsahuje.
 Dříve vydaný ConsolePi-Plus-1.9.0-generic-v16.img.xz soubor ještě nenačítá.
 Pouhé přidání textového souboru do tohoto staršího image nestačí.
 

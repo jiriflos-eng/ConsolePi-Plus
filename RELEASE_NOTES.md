@@ -1,3 +1,13 @@
+## Oprava image 2.0.0-r2 · 22. října 2026
+
+- Aplikace zůstává 2.0.0. První předběžný image měl kvůli chybě sestavení
+  zakázané služby SSH a webu a je označen jako vadný.
+- Revize r2 opravuje start služeb bez změny klíčové autentizace či firstboot gate.
+- Generic validátor nyní vyžaduje povolení každé SSH/web/monitorovací služby
+  zvlášť; původní vadný obraz tímto testem neprojde.
+- Použijte pevný manifest `ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest` z
+  vydání `v2.0.0-r2`. Obraz ještě čeká na nový fyzický první start a reboot.
+
 # ConsolePi+ 2.0.0 · Ping Monitor
 
 - Kontinuální ICMP monitoring v samostatné službě `consolepi-ping.service`,

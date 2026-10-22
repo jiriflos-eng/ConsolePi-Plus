@@ -164,6 +164,11 @@ check boot_network_dependency grep -qx 'Requires=consolepi-boot-network.service'
 check boot_network_order grep -qx 'After=consolepi-boot-network.service' /etc/systemd/system/NetworkManager.service.d/consolepi-boot-network.conf
 check boot_network_unit systemd-analyze verify /etc/systemd/system/consolepi-boot-network.service
 check generic_recovery_enabled systemctl is-enabled --quiet consolepi-generic-recovery.service
+# Each unit must be enabled separately: is-enabled with several names succeeds
+# if any one is enabled and could hide a disabled SSH/web service.
+for service in ssh nginx consolepi-web consolepi-port-monitor consolepi-ping consolepi-update-check.timer; do
+    check "${service}_enabled" systemctl is-enabled --quiet "$service"
+done
 for service in ssh nginx consolepi-web; do
     check "${service}_dependency" test -f "/etc/systemd/system/$service.service.d/consolepi-generic-image.conf"
 done

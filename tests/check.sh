@@ -227,6 +227,7 @@ grep -q '^Match User console LocalPort 2201$' "$ROOT/etc/ssh/sshd_config.d/40-co
     grep -q '/var/backups/consolepi' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
     grep -q 'systemctl stop consolepi-ping.service' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
     grep -q 'clear_directory("/var/lib/consolepi-ping")' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
+    grep -q 'ssh nginx consolepi-web consolepi-port-monitor consolepi-ping consolepi-update-check.timer' "$ROOT/usr/local/sbin/consolepi-validate-generic-image" &&
     grep -q 'check ping_data_empty' "$ROOT/usr/local/sbin/consolepi-validate-generic-image" &&
     grep -q 'systemd-analyze verify' "$ROOT/usr/local/sbin/consolepi-prepare-generic-image" &&
     grep -q 'validate_generic_access' "$ROOT/usr/local/sbin/consolepi-generic-image-firstboot" &&

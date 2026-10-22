@@ -21,10 +21,10 @@ local untracked output must not enter a release archive.
 Use title **ConsolePi+ vX.Y.Z** and prefix `ConsolePi-Plus-X.Y.Z-*`.
 For 2.0.0 the prerelease contains:
 
-- `ConsolePi-Plus-2.0.0-generic.img.xz`;
+- `ConsolePi-Plus-2.0.0-r2-generic.img.xz`;
 - `ConsolePi-Plus-2.0.0-install.tar.gz` and `ConsolePi-Plus-2.0.0-source.tar.gz`;
 - per-archive SHA-256 files and `SHA256SUMS`;
-- `ConsolePi-Plus-2.0.0.rpi-imager-manifest` and the stable-name alias
+- `ConsolePi-Plus-2.0.0-r2.rpi-imager-manifest` and the stable-name alias
   `ConsolePi-Plus.rpi-imager-manifest`;
 - Imager icons and the image installation guide.
 

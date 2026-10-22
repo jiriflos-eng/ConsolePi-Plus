@@ -1,6 +1,20 @@
 # Image ConsolePi+ 2.0.0 — kontrola předběžného vydání
 
-Datum sestavení: 21. 10. 2026. Cíl: Raspberry Pi 3 B/B+, arm64.
+Opravená revize image: **2.0.0-r2**, 22. 10. 2026. Verze aplikace: **2.0.0**. Cíl: Raspberry Pi 3 B/B+, arm64.
+
+## Oprava prvního obrazu
+
+První image 2.0.0 z 21. 10. 2026 měl po offline sestavení zakázané služby
+SSH a webu. Při fyzickém testu RPi odpovídalo na ping, ale odmítalo TCP/22 a
+TCP/443. Příčinou byl chybný závěrečný krok sestavení, nikoli SSH klíč uživatele.
+Tento obraz je označený jako vadný a nemá se používat pro nové instalace.
+
+Revize r2 ponechává SSH, nginx, web, port monitor, Ping Monitor a aktualizační
+časovač povolené pro boot. Závislosti na generic firstboot se zachovávají;
+služby se uvolní až po úspěšném ověření Imager nastavení. Nový validátor
+kontroluje povolení každé jednotky zvlášť. Na kopii původního obrazu se jeho
+kontrola prokazatelně zastavila na `ssh_enabled`; po opravě všechny kontroly
+prošly. Tím se neoslabuje autentizace ani první provisioning.
 
 ## Původ a sestavení
 
@@ -27,6 +41,8 @@ nepřebírají. Čistý FAT boot oddíl a mezery mezi oddíly se zachovávají z
 - regresní test sanitizace SQLite/WAL/SHM a bezpečného zacházení se symlinky;
 - `consolepi-validate-generic-image`: PASS v offline chrootu se skutečnými
   kontrolami souborů, účtů, SSH konfigurace, firewallu a systemd jednotek;
+- negativní test původního obrazu (`ssh_enabled` FAIL), následný PASS po
+  povolení všech požadovaných jednotek;
 - samostatná kontrola jednotky `consolepi-ping.service` a přítomnosti `fping`;
 - ext4 `e2fsck`: bez chyb po vyčištění;
 - byte scan hotového obrazu: žádný úplný privátní klíč ve volných blocích;
