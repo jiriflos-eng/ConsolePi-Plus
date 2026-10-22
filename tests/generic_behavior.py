@@ -830,7 +830,7 @@ printf '2: eth0 inet 192.0.2.5/24 brd 192.0.2.255 scope global eth0\n'
         if mode == 'delayed':
             assert result.returncode == 0, result
             san = subprocess.check_output(['openssl','x509','-in',str(tls/'consolepi.crt'),
-                                           '-noout','-ext','subjectAltName'], text=True)
+                                           '-noout','-text'], text=True)
             assert 'IP Address:192.0.2.5' in san, san
         else:
             assert result.returncode != 0
