@@ -1,7 +1,7 @@
 # ConsolePi+ 2.0.0: čistá instalace na Raspberry Pi 3
 
-> Vydání 2.0.0 je předběžné: nový image čeká na fyzický první start a reboot.
-> Použijte pevný manifest 2.0.0; odkaz latest zatím vede na stabilní 1.9.1.
+> Stabilní vydání 2.0.0 (image r3) prošlo čistou instalací a rebootem na RPi3
+> dne 23. 10. 2026. Pevný manifest i odkaz latest nyní vedou na toto vydání.
 > Ping Monitor: [instalace a přejímka](PING-MONITOR.md).
 
 Pro standardní zápis hotového ConsolePi+ použijte

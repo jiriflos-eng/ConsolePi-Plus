@@ -2,10 +2,11 @@
 
 Source documentation for **ConsolePi+ 2.0.0**, including the new [Ping Monitor](docs/PING-MONITOR.md).
 
-The [2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
+The stable [2.0.0 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
 contains a sanitized generic image, Raspberry Pi Imager manifest, installer,
-source archive and SHA-256 checksums. The image awaits a fresh physical SD-card
-first-boot/reboot test; the stable `latest` release remains 1.9.1.
+source archive and SHA-256 checksums. Image revision r3 passed fresh installation,
+web setup and reboot acceptance on Raspberry Pi 3 on 23 October 2026. The
+`latest` Imager manifest now points to this release.
 No signed 2.0.0 application update is provided. The screenshots below show 1.9.1.
 
 ![ConsolePi+ 1.9.1 administration overview](docs/screenshots/1.9.1/01-prehled.jpg)
@@ -41,7 +42,7 @@ available in English here and in Czech in [README.cs.md](README.cs.md).
 
 ## Ready-to-flash image with Raspberry Pi Imager
 
-[ConsolePi+ 2.0.0 prerelease](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
+[ConsolePi+ 2.0.0 release](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/tag/v2.0.0-r3)
 includes the generic image and [Imager manifest](https://github.com/jiriflos-eng/ConsolePi-Plus/releases/download/v2.0.0-r3/ConsolePi-Plus-2.0.0-r3.rpi-imager-manifest).
 Open the downloaded manifest, or set its URL under Imager Settings → Content Repository → Edit.
 For a repository URL that follows the latest release, use:
@@ -221,7 +222,7 @@ transcripts. See [configuration, delivery limits and distribution status](docs/S
 
 ## Ping Monitor
 
-[Image validation and pending acceptance checks](docs/RELEASE-2.0.0.md).
+[Image validation and hardware acceptance](docs/RELEASE-2.0.0.md).
 
 Enable **Ping Monitor** in administration, open `/ping` and add a name and
 IP address or hostname. Start with a 30-second interval, one probe and a
@@ -249,4 +250,4 @@ From a reviewed source checkout, run:
 With VERSION set to 2.0.0, this creates
 `dist/ConsolePi-Plus-2.0.0-install.tar.gz` and its SHA-256 file locally.
 This command does not publish a GitHub release, build a ready-to-flash image,
-or create a signed application update. Download the corresponding assets from the version-specific 2.0.0 prerelease.
+or create a signed application update. Download the corresponding assets from the version-specific 2.0.0 release.

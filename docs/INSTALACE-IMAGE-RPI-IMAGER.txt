@@ -2,8 +2,8 @@ ConsolePi+ 2.0.0 – instalace generic SD image pomocí Raspberry Pi Imageru
 ===================================================================
 
 Tento postup je určen pro připravený soubor ConsolePi+ ve formátu .img.xz.
-Jde o předběžné vydání čekající na fyzický první start a reboot.
-Odkaz latest zatím vede na stabilní 1.9.1; pro 2.0.0 použijte pevný manifest.
+Stabilní revize r3 prošla čistou instalací, průvodcem a restartem na RPi3
+dne 23. 10. 2026. Pevný manifest i odkaz latest vedou na vydání 2.0.0-r3.
 Soubor nerozbalujte. Raspberry Pi Imager jej umí zapsat přímo.
 
 UPOZORNĚNÍ

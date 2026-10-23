@@ -1,3 +1,14 @@
+## Stabilní image 2.0.0-r3 · 23. října 2026
+
+- Uživatel potvrdil čerstvou instalaci r3. Následně bylo přímo na RPi3 ověřeno
+  SSH, správný firstboot skript, dokončený průvodce a HTTPS bez opravy certifikátu.
+- Prošel reboot, zachování DHCP profilu, tří konfigurací zařízení a historie,
+  pokračování sběru, heartbeat i SQLite quick_check.
+- R3 je stabilní vydání a latest manifest nyní vede na něj. Verze aplikace
+  zůstává 2.0.0; původní artefakty a jejich SHA-256 se nepřepisují.
+- K vydání přibyl samostatný HARDWARE-ACCEPTANCE.json a jeho SHA-256.
+- Dlouhodobá zátěž a fyzická sériová konzole nejsou touto přejímkou doložené.
+
 ## Image 2.0.0-r3 · 22. října 2026
 
 - Čistý image zahrnuje opravu čekání na Ethernet IPv4 před vytvořením

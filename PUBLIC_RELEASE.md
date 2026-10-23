@@ -2,8 +2,8 @@
 
 The public repository is [jiriflos-eng/ConsolePi-Plus](https://github.com/jiriflos-eng/ConsolePi-Plus),
 licensed under [MIT](LICENSE). The current source version is **2.0.0**; the
-stable image/archive release remains **1.9.1**. The **2.0.0 prerelease** provides
-a sanitized image and matching artifacts for a fresh physical boot test. Use this
+stable image/archive release is **2.0.0 (image r3)**, tagged **v2.0.0-r3**.
+Fresh installation, web setup and reboot acceptance passed on 23 October 2026. Use this
 checklist for subsequent publication; repository creation and license selection
 have already been completed.
 
@@ -19,7 +19,7 @@ local untracked output must not enter a release archive.
 ## Release artifacts
 
 Use title **ConsolePi+ vX.Y.Z** and prefix `ConsolePi-Plus-X.Y.Z-*`.
-For 2.0.0 the prerelease contains:
+For 2.0.0 the stable release contains:
 
 - `ConsolePi-Plus-2.0.0-r3-generic.img.xz`;
 - `ConsolePi-Plus-2.0.0-install.tar.gz` and `ConsolePi-Plus-2.0.0-source.tar.gz`;
@@ -50,8 +50,8 @@ compression; logical file deletion alone is insufficient.
 
 Signed `.cpiupdate` application packages are a separate distribution mechanism.
 Do not imply that such a package exists for a release without publishing it;
-2.0.0 prerelease assets include the image, source and installer listed above.
-See [build validation and pending checks](docs/RELEASE-2.0.0.md).
+2.0.0 release assets include the image, source and installer listed above.
+See [build validation and hardware acceptance](docs/RELEASE-2.0.0.md).
 Keep previously published release assets and tags immutable when only updating
 repository documentation.
 
@@ -63,3 +63,8 @@ client links accurate. Use repository-local, dated screenshots with explanatory
 captions. Audit material must distinguish illustration from executed test evidence.
 Retain upstream licenses and notices for Raspberry Pi OS/Debian and other
 components; do not imply vendor endorsement.
+
+The original image, archive, manifest and SHA256SUMS assets are immutable.
+`IMAGE-VALIDATION.json` records build-time checks and their then-pending hardware
+steps. The subsequent `HARDWARE-ACCEPTANCE.json` and its separate SHA-256 file
+record completed installation acceptance without rewriting those build assets.

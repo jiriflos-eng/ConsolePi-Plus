@@ -1,4 +1,4 @@
-# Image ConsolePi+ 2.0.0 — kontrola předběžného vydání
+# Image ConsolePi+ 2.0.0 — sestavení a hardwarová přejímka
 
 Aktuální revize image: **2.0.0-r3**, 22. 10. 2026. Verze aplikace: **2.0.0**. Cíl: Raspberry Pi 3 B/B+, arm64.
 
@@ -16,9 +16,9 @@ v dočasném adresáři; do distribučního obrazu žádné testovací klíče n
 
 Obraz je sestaven z čistého offline základu, bez kopírování provozní SD karty.
 Validátor ověřuje povolené služby, prázdnou Ping DB, absentující identity,
-firstboot pending, konfiguraci bootu a syntaxe SSH/firewall/systemd. Nový r3
-soubor musí ještě projít čerstvým fyzickým prvním startem a rebootem; provozní
-výsledky opraveného r2 níže jsou samostatné a tento krok nenahrazují.
+firstboot pending, konfiguraci bootu a syntaxe SSH/firewall/systemd. Čerstvý
+první start a reboot r3 prošly dne 23. 10. 2026; samostatný záznam je níže.
+Starší výsledky opraveného r2 se evidují odděleně.
 
 ## Oprava prvního obrazu
 
@@ -105,13 +105,28 @@ přesměrování do průvodce a statický profil zůstal zachovaný. SQLite
 vrátil `throttled=0x0`. Jde o krátké provozní měření jednoho cíle, nikoli
 kapacitní ani dlouhodobý zátěžový test.
 
-## Zbývající přejímka
+## Fyzická přejímka r3 · 23. 10. 2026
 
-Čistý r3 build už zahrnuje opravu prvotního TLS certifikátu. Zbývá jeho čerstvý
-zápis přes Imager, první start, dokončení průvodce a reboot na fyzickém RPi3.
-Provozní test opraveného r2 nenahrazuje ověření nového souboru image.
-Dlouhodobý zátěžový test a fyzická sériová konzole zůstávají samostatnými kroky.
+Uživatel potvrdil instalaci nového image r3 přes Imager. Na RPi3 byl ověřen
+firstboot skript shodný s vydaným payloadem, dokončený provisioning, SSH přes
+klíč správce a HTTPS s plným ověřením certifikátu. Nebylo potřeba obnovovat
+certifikát ani měnit soubory systému. Síť při této přejímce používala DHCP.
 
-Vydání r3 zůstává **prerelease**; stabilní latest je stále 1.9.1. Starší vydané
-soubory se zpětně nepřepisují. Pro test použijte pevný manifest r3; na stabilní
-vydání lze povýšit až po ověření nového image.
+Po řízeném restartu se změnilo boot ID, služby SSH/nginx/web/Ping byly aktivní,
+web vrátil HTTP 200 přes ověřené HTTPS a průvodce se znovu neotevřel. Síťový
+profil, nastavení tří monitorovaných zařízení (porovnáno hashem) i historie
+zůstaly zachované. Přibyly nové sondy, heartbeat byl čerstvý a SQLite quick_check
+vrátilo `ok`. Veřejné Ping API nevracelo adresy zařízení.
+
+R3 je na základě této přejímky označená jako **stabilní** a alias latest vede
+na `v2.0.0-r3`. Verze aplikace zůstává **2.0.0**. Dříve publikované image,
+archivy, manifesty, SHA256SUMS ani původní IMAGE-VALIDATION.json se nemění:
+ten zachycuje stav při sestavení. Následnou přejímku uvádí samostatný soubor
+HARDWARE-ACCEPTANCE.json s vlastním SHA-256 u vydání.
+
+## Rozsah a zbývající testy
+
+Jde o přejímku instalace a restartu na Raspberry Pi 3. Není tím doložená
+kapacita při dlouhodobé zátěži ani funkce připojené fyzické sériové konzole;
+tyto provozní testy zůstávají samostatné. Starší fyzický test statické adresy
+na opraveném r2 je výše; zde proběhl boot přes DHCP.
